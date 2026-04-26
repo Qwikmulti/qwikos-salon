@@ -1,4 +1,5 @@
-import { getPrisma } from "../src/lib/prisma/client";
+import "dotenv/config";
+import { prisma } from "../src/lib/prisma/client";
 
 const ADMIN_ID = "seed-admin-001";
 const STYLIST_1_ID = "seed-stylist-001";
@@ -6,8 +7,13 @@ const STYLIST_2_ID = "seed-stylist-002";
 const STYLIST_3_ID = "seed-stylist-003";
 
 async function main() {
-  const prisma = await getPrisma();
   console.log("🌱 Seeding database...");
+
+  // Clean up previous bad seed data where IDs were mismatched
+  await prisma.recurringHours.deleteMany();
+  await prisma.stylistService.deleteMany();
+  await prisma.stylist.deleteMany();
+  await prisma.profile.deleteMany();
 
   await prisma.profile.upsert({
     where: { id: ADMIN_ID },
@@ -61,6 +67,7 @@ async function main() {
     where: { profileId: STYLIST_1_ID },
     update: {},
     create: {
+      id: STYLIST_1_ID,
       profileId: STYLIST_1_ID,
       bio: "Specialist in all protective styles with 7 years of dedicated craft.",
       specialties: ["Braiding", "Natural Hair", "Locs"],
@@ -74,6 +81,7 @@ async function main() {
     where: { profileId: STYLIST_2_ID },
     update: {},
     create: {
+      id: STYLIST_2_ID,
       profileId: STYLIST_2_ID,
       bio: "Master barber and colorist — from skin fades to vibrant color transformations.",
       specialties: ["Fades", "Beard", "Locs", "Color"],
@@ -87,6 +95,7 @@ async function main() {
     where: { profileId: STYLIST_3_ID },
     update: {},
     create: {
+      id: STYLIST_3_ID,
       profileId: STYLIST_3_ID,
       bio: "Award-winning colorist and treatment specialist with a gentle, meticulous approach.",
       specialties: ["Balayage", "Keratin", "Treatments"],
@@ -310,6 +319,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    const prisma = await getPrisma();
     await prisma.$disconnect();
   });

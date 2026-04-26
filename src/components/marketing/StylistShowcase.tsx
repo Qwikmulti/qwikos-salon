@@ -59,7 +59,8 @@ export async function StylistShowcase() {
                   {stylist.instagramHandle && (
                     <a
                       href={`https://instagram.com/${stylist.instagramHandle.replace("@", "")}`}
-                      onClick={e => e.stopPropagation()}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="absolute top-4 right-4 p-2 rounded-full bg-obsidian/80 text-silver hover:text-gold transition-colors"
                     >
                       <Globe className="h-4 w-4" />

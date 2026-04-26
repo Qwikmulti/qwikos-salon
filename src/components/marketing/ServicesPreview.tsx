@@ -48,7 +48,7 @@ export async function ServicesPreview() {
           {services.map((s, i) => {
             const slug = serviceSlugs[s.category] ?? "services";
             const tag = i === 0 ? "Most Booked" : i === 1 ? "Trending" : null;
-            const img = IMAGES.services[s.category.toLowerCase()] ?? IMAGES.services.haircut;
+            const img = (IMAGES.services as Record<string, string>)[s.category.toLowerCase()] ?? IMAGES.services.haircut;
 
             return (
               <motion.div

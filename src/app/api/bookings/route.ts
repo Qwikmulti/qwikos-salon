@@ -15,15 +15,18 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") ?? "1");
   const limit = parseInt(searchParams.get("limit") ?? "10");
 
-  const profile = await prisma.profile.findUnique({ where: { id: user.id } });
+  const profile = await prisma.profile.findUnique({ 
+    where: { id: user.id },
+    include: { stylist: true }
+  });
   if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
   const where: Record<string, unknown> = {};
 
   if (profile.role === "CUSTOMER") {
     where.customerId = user.id;
-  } else if (profile.role === "STYLIST") {
-    where.stylistId = profile.stylist?.id;
+  } else if (profile.role === "STYLIST" && profile.stylist) {
+    where.stylistId = profile.stylist.id;
   }
 
   if (status) {
