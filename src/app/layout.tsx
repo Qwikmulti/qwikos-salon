@@ -3,6 +3,9 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import { ROOT_METADATA } from "@/lib/seo/metadata";
+import { validateEnv } from "@/lib/env";
+
+validateEnv();
 
 export const metadata: Metadata = ROOT_METADATA;
 

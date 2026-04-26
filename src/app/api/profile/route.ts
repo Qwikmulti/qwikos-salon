@@ -49,6 +49,25 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { searchParams } = req.nextUrl;
+  const listAll = searchParams.get("all");
+
+  // List all profiles (admin only)
+  if (listAll === "true") {
+    const profile = await prisma.profile.findUnique({ where: { id: user.id } });
+    if (!profile || profile.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const profiles = await prisma.profile.findMany({
+      where: { role: "CUSTOMER" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ profiles });
+  }
+
+  // Get own profile
   const profile = await prisma.profile.findUnique({ where: { id: user.id } });
   if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 

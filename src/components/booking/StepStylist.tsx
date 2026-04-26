@@ -1,15 +1,18 @@
 "use client";
+import { useState, useEffect } from "react";
 import { StylistCard } from "@/components/ui/stylist-card";
 import { Button }      from "@/components/ui/button";
 import { SkeletonStylistCard } from "@/components/ui/skeleton";
 import { ArrowLeft }   from "lucide-react";
 
-// Mock stylist data — replace with real fetch filtered by serviceId
-const STYLISTS = [
-  { id:"sty-1", name:"Fatima Hassan",    specialties:["Braiding","Natural Hair","Locs"], yearsExperience:7, rating:4.9, reviewCount:214, totalBookings:856, isActive:true, bio:"Specialist in all protective styles with 7 years of dedicated craft." },
-  { id:"sty-2", name:"Emeka Nwachukwu", specialties:["Fades","Beard","Locs","Color"],   yearsExperience:5, rating:4.8, reviewCount:178, totalBookings:641, isActive:true, bio:"Master barber and colorist — from skin fades to vibrant color transformations." },
-  { id:"sty-3", name:"Amara Diallo",    specialties:["Balayage","Keratin","Treatments"],yearsExperience:9, rating:5.0, reviewCount:312, totalBookings:1204,isActive:true, bio:"Award-winning colorist and treatment specialist with a gentle, meticulous approach." },
-];
+interface StylistData {
+  id: string;
+  profile: { fullName: string; avatarUrl: string | null };
+  bio: string | null;
+  specialties: string[];
+  yearsExperience: number;
+  isActive: boolean;
+}
 
 interface Props {
   serviceId: string;
@@ -19,9 +22,24 @@ interface Props {
 }
 
 export function StepStylist({ serviceId, selected, onSelect, onBack }: Props) {
-  // In production: const { stylists, loading } = useStylistsByService(serviceId)
-  const stylists = STYLISTS;
-  const loading  = false;
+  const [stylists, setStylists] = useState<StylistData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStylists() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/stylists?serviceId=${serviceId}`);
+        const data = await res.json();
+        if (data.stylists) setStylists(data.stylists);
+      } catch (e) {
+        console.error("Failed to load stylists:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStylists();
+  }, [serviceId]);
 
   return (
     <div>
@@ -67,13 +85,17 @@ export function StepStylist({ serviceId, selected, onSelect, onBack }: Props) {
               className={`cursor-pointer rounded-2xl transition-all duration-200 ${
                 selected === s.id ? "ring-2 ring-gold ring-offset-2 ring-offset-charcoal" : ""
               }`}
-              onClick={() => onSelect(s.id, s.name)}
+              onClick={() => onSelect(s.id, s.profile.fullName)}
             >
               <StylistCard
-                {...s}
-                avatarUrl={undefined}
-                instagramHandle={undefined}
-                onBook={id => onSelect(id, s.name)}
+                id={s.id}
+                name={s.profile.fullName}
+                bio={s.bio ?? undefined}
+                specialties={s.specialties}
+                yearsExperience={s.yearsExperience}
+                isActive={s.isActive}
+                avatarUrl={s.profile.avatarUrl}
+                onBook={id => onSelect(id, s.profile.fullName)}
               />
             </div>
           ))}

@@ -8,6 +8,8 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+seed = "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+
 enum Role {
   CUSTOMER
   STYLIST
@@ -50,7 +52,7 @@ model Profile {
   email     String   @unique
   fullName  String
   phone     String?
-  avatarUrl String?  // Supabase Storage: avatars/{userId}/avatar.jpg
+  avatarUrl String?
   role      Role     @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,10 +71,9 @@ model Stylist {
   yearsExperience Int      @default(0)
   isActive        Boolean  @default(true)
   instagramHandle String?
-  // Supabase Storage URLs
-  heroImageUrl    String?  // stylist-photos/{stylistId}/hero.jpg
-  portfolioUrls   String[] // portfolios/{stylistId}/{filename}
-  portfolioImages Json     @default("[]") // [{ id, url, path, caption }]
+  heroImageUrl    String?
+  portfolioUrls   String[]
+  portfolioImages Json     @default("[]")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -93,8 +94,8 @@ model Service {
   category    ServiceCategory
   durationMin Int
   price       Decimal         @db.Decimal(10, 2)
-  imageUrl    String?         // services/{serviceId}.jpg — Supabase Storage
-  imagePath   String?         // Storage path for deletion
+  imageUrl    String?
+  imagePath   String?
   isActive    Boolean         @default(true)
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -179,7 +180,7 @@ model Booking {
 
   customer Profile @relation(fields: [customerId], references: [id])
   stylist  Stylist @relation(fields: [stylistId], references: [id])
-  service  Service @relation(fields: [serviceId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
   review   Review?
 
   @@map("bookings")
@@ -203,8 +204,8 @@ model BlogPost {
   slug            String    @unique
   excerpt         String?
   content         String
-  coverImageUrl   String?   // blog/{postId}.jpg — Supabase Storage
-  coverImagePath  String?   // Storage path for deletion
+  coverImageUrl   String?
+  coverImagePath  String?
   tags            String[]
   published       Boolean   @default(false)
   publishedAt     DateTime?
@@ -222,7 +223,7 @@ model SalonSettings {
   address         String?
   phone           String?
   email           String?
-  logoUrl         String?  // Supabase Storage: public bucket
+  logoUrl         String?
   heroImageUrl    String?
   openingHours    Json?
   socialLinks     Json?

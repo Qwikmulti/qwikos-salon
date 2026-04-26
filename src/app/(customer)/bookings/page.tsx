@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button }     from "@/components/ui/button";
 import { Badge }      from "@/components/ui/badge";
 import { Avatar }     from "@/components/ui/avatar";
@@ -13,30 +13,49 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PageHeader }    from "@/components/ui/page-header";
 import { useBooking }    from "@/hooks/useBooking";
 import { formatDate, formatTime } from "@/lib/utils/dates";
-import { CalendarDays, Clock, Plus, XCircle, Star } from "lucide-react";
+import { CalendarDays, Clock, Plus, XCircle, Star, CheckCircle2 } from "lucide-react";
 import type { BookingStatus } from "@/types";
+
+interface BookingData {
+  id: string;
+  stylist: { profile: { fullName: string } };
+  service: { name: string; price: number };
+  startAt: string;
+  endAt: string;
+  status: BookingStatus;
+}
 
 const statusVariant: Record<BookingStatus,"success"|"warning"|"danger"|"info"|"default"> = {
   CONFIRMED:"success", PENDING:"warning", CANCELLED:"danger", COMPLETED:"info", NO_SHOW:"default",
 };
 
-// Mock data
-const ALL_BOOKINGS = [
-  { id:"b1", service:"Box Braids",      stylist:"Fatima Hassan", startAt:new Date(Date.now()+1000*60*60*26), endAt:new Date(Date.now()+1000*60*60*26+180*60000), status:"CONFIRMED" as BookingStatus, price:30000 },
-  { id:"b2", service:"Deep Conditioning",stylist:"Amara Diallo",  startAt:new Date(Date.now()+1000*60*60*72), endAt:new Date(Date.now()+1000*60*60*72+60*60000),  status:"PENDING"  as BookingStatus, price:8000  },
-  { id:"b3", service:"Precision Cut",   stylist:"Emeka Nwachukwu",startAt:new Date(Date.now()-1000*60*60*48), endAt:new Date(Date.now()-1000*60*60*47),             status:"COMPLETED"as BookingStatus, price:8000  },
-  { id:"b4", service:"Balayage",        stylist:"Amara Diallo",  startAt:new Date(Date.now()-1000*60*60*200),endAt:new Date(Date.now()-1000*60*60*197),             status:"COMPLETED"as BookingStatus, price:35000 },
-  { id:"b5", service:"Knotless Braids", stylist:"Fatima Hassan", startAt:new Date(Date.now()-1000*60*60*400),endAt:new Date(Date.now()-1000*60*60*394),             status:"CANCELLED"as BookingStatus, price:30000 },
-];
-
 export default function BookingsPage() {
-  const { cancelBooking, loading } = useBooking();
+  const searchParams = useSearchParams();
+  const booked = searchParams.get("booked") === "1";
+  const { cancelBooking, loading: cancelLoading } = useBooking();
+  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [cancelId,   setCancelId]  = useState<string | null>(null);
   const [rateId,     setRateId]    = useState<string | null>(null);
   const [starRating, setStarRating]= useState(0);
 
-  const upcoming  = ALL_BOOKINGS.filter(b => ["PENDING","CONFIRMED"].includes(b.status));
-  const past      = ALL_BOOKINGS.filter(b => ["COMPLETED","CANCELLED","NO_SHOW"].includes(b.status));
+  useEffect(() => {
+    async function fetchBookings() {
+      try {
+        const res = await fetch("/api/bookings");
+        const data = await res.json();
+        if (data.bookings) setBookings(data.bookings);
+      } catch (e) {
+        console.error("Failed to load bookings:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBookings();
+  }, []);
+
+  const upcoming  = bookings.filter(b => ["PENDING","CONFIRMED"].includes(b.status));
+  const past      = bookings.filter(b => ["COMPLETED","CANCELLED","NO_SHOW"].includes(b.status));
 
   const handleCancel = async () => {
     if (!cancelId) return;
@@ -44,28 +63,28 @@ export default function BookingsPage() {
     if (ok) setCancelId(null);
   };
 
-  const BookingRow = ({ b }: { b: typeof ALL_BOOKINGS[0] }) => (
+  const BookingRow = ({ b }: { b: BookingData }) => (
     <Card variant="elevated" className="p-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <Avatar name={b.stylist} size="md" />
+          <Avatar name={b.stylist.profile.fullName} size="md" />
           <div>
-            <p className="font-body text-sm font-medium text-pearl">{b.service}</p>
-            <p className="font-body text-xs text-mist">with {b.stylist}</p>
+            <p className="font-body text-sm font-medium text-pearl">{b.service.name}</p>
+            <p className="font-body text-xs text-mist">with {b.stylist.profile.fullName}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-display text-lg text-gold-light">£{b.price.toLocaleString()}</span>
+          <span className="font-display text-lg text-gold-light">£{Number(b.service.price).toLocaleString()}</span>
           <Badge variant={statusVariant[b.status]}>{b.status.toLowerCase()}</Badge>
         </div>
       </div>
 
       <div className="flex items-center gap-5 mt-4 pt-4 border-t border-white/[0.05] flex-wrap">
         <span className="flex items-center gap-1.5 font-body text-xs text-silver">
-          <CalendarDays className="h-3.5 w-3.5 text-mist" />{formatDate(b.startAt)}
+          <CalendarDays className="h-3.5 w-3.5 text-mist" />{formatDate(new Date(b.startAt))}
         </span>
         <span className="flex items-center gap-1.5 font-body text-xs text-silver">
-          <Clock className="h-3.5 w-3.5 text-mist" />{formatTime(b.startAt)} – {formatTime(b.endAt)}
+          <Clock className="h-3.5 w-3.5 text-mist" />{formatTime(new Date(b.startAt))} – {formatTime(new Date(b.endAt))}
         </span>
 
         <div className="ml-auto flex gap-2">
@@ -96,6 +115,23 @@ export default function BookingsPage() {
         }
         className="mb-8"
       />
+
+      <AnimatePresence>
+        {booked && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="mb-6 p-4 rounded-xl bg-success/10 border border-success/20 flex items-center gap-3"
+          >
+            <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
+            <div>
+              <p className="font-body text-sm text-pearl">Booking confirmed!</p>
+              <p className="font-body text-xs text-mist">We've sent you a confirmation email.</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Tabs defaultValue="upcoming">
         <TabsList className="mb-6">
@@ -137,7 +173,7 @@ export default function BookingsPage() {
         description="Are you sure you want to cancel this booking? This action cannot be undone."
         confirmLabel="Yes, Cancel"
         variant="danger"
-        loading={loading}
+        loading={cancelLoading}
         onConfirm={handleCancel}
       />
 
@@ -160,7 +196,23 @@ export default function BookingsPage() {
             </div>
             <div className="flex gap-3">
               <Button variant="ghost" size="sm" className="flex-1" onClick={() => setRateId(null)}>Skip</Button>
-              <Button size="sm" className="flex-1" disabled={!starRating} onClick={() => setRateId(null)}>Submit</Button>
+              <Button 
+                size="sm" 
+                className="flex-1" 
+                disabled={!starRating} 
+                onClick={async () => {
+                  if (!rateId || !starRating) return;
+                  await fetch("/api/reviews", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ bookingId: rateId, rating: starRating }),
+                  });
+                  setRateId(null);
+                  setStarRating(0);
+                }}
+              >
+                Submit
+              </Button>
             </div>
           </motion.div>
         </div>

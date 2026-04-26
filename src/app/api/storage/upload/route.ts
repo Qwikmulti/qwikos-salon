@@ -1,11 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ALLOWED_TYPES, MAX_SIZES, type BucketName } from "@/lib/supabase/storage";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
+  const rateKey = getRateLimitKey(req);
+  const record = new Map<string, { count: number; resetAt: number }>().get(rateKey);
+  const now = Date.now();
+
+  const limitMap = new Map<string, { count: number; resetAt: number }>();
+  const windowMs = 60 * 1000;
+  const limit = 5;
+
+  if (!limitMap.has(rateKey) || now > (limitMap.get(rateKey)?.resetAt ?? 0)) {
+    limitMap.set(rateKey, { count: 1, resetAt: now + windowMs });
+  } else {
+    const rec = limitMap.get(rateKey)!;
+    if (rec.count >= limit) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+    rec.count++;
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });

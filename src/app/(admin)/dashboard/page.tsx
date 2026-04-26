@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageHeader }  from "@/components/ui/page-header";
-import { StatCard }    from "@/components/ui/stat-card";
+import { prisma } from "@/lib/prisma/client";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatCard } from "@/components/ui/stat-card";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge }       from "@/components/ui/badge";
-import { Avatar }      from "@/components/ui/avatar";
-import { Button }      from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { formatTime, formatDate } from "@/lib/utils/dates";
 import {
   CalendarDays, TrendingUp, Users, Scissors,
@@ -15,39 +18,84 @@ import type { BookingStatus } from "@/types";
 
 export const metadata: Metadata = { title: "Admin Dashboard" };
 
-const recentBookings = [
-  { id:"b1", customer:"Adaeze Okonkwo",  stylist:"Fatima Hassan",    service:"Box Braids",    startAt:new Date(Date.now()+1000*60*60*2),  status:"CONFIRMED" as BookingStatus, price:30000 },
-  { id:"b2", customer:"Chidi Okafor",    stylist:"Emeka Nwachukwu",  service:"Fade + Beard",  startAt:new Date(Date.now()+1000*60*60*3),  status:"PENDING"   as BookingStatus, price:9000  },
-  { id:"b3", customer:"Ngozi Eze",       stylist:"Amara Diallo",     service:"Balayage",      startAt:new Date(Date.now()+1000*60*60*5),  status:"CONFIRMED" as BookingStatus, price:35000 },
-  { id:"b4", customer:"Tunde Adesanya",  stylist:"Fatima Hassan",    service:"Keratin",       startAt:new Date(Date.now()+1000*60*60*8),  status:"CONFIRMED" as BookingStatus, price:45000 },
-  { id:"b5", customer:"Funke Bello",     stylist:"Amara Diallo",     service:"Full Color",    startAt:new Date(Date.now()-1000*60*60*2),  status:"COMPLETED" as BookingStatus, price:25000 },
-];
-
-const topStylists = [
-  { name:"Amara Diallo",    bookings:48, revenue:"£24k", rating:5.0 },
-  { name:"Fatima Hassan",   bookings:41, revenue:"£19k", rating:4.9 },
-  { name:"Emeka Nwachukwu", bookings:35, revenue:"£12k", rating:4.8 },
-];
-
-const alerts = [
-  { type:"warning", message:"3 pending bookings need confirmation", href:"/admin/bookings?status=PENDING" },
-  { type:"info",    message:"Fatima Hassan has no availability set for next week", href:"/admin/stylists" },
-];
-
 const statusVariant = {
-  CONFIRMED:"success", PENDING:"warning", CANCELLED:"danger", COMPLETED:"info", NO_SHOW:"default",
+  CONFIRMED: "success", PENDING: "warning", CANCELLED: "danger", COMPLETED: "info", NO_SHOW: "default",
 } as const;
 
-// Sparkline bars (mock revenue trend)
-const weeklyRevenue = [62, 75, 58, 90, 84, 110, 96];
+export default async function AdminDashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
-export default function AdminDashboardPage() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const [
+    totalCustomers,
+    totalStylists,
+    todayBookings,
+    recentBookings,
+    pendingBookings,
+  ] = await Promise.all([
+    prisma.profile.count({ where: { role: "CUSTOMER" } }),
+    prisma.stylist.count({ where: { isActive: true } }),
+    prisma.booking.count({
+      where: { startAt: { gte: today }, startAt: { lt: tomorrow } },
+    }),
+    prisma.booking.findMany({
+      take: 10,
+      orderBy: { createdAt: "desc" },
+      include: {
+        customer: { select: { fullName: true } },
+        stylist: { include: { profile: { select: { fullName: true } } },
+        service: { select: { name: true, price: true } },
+      },
+    }),
+    prisma.booking.count({ where: { status: "PENDING" } }),
+  ]);
+
+  const alerts: { type: "warning" | "info"; message: string; href: string }[] = [];
+  if (pendingBookings > 0) {
+    alerts.push({
+      type: "warning",
+      message: `${pendingBookings} pending bookings need confirmation`,
+      href: "/admin/bookings?status=PENDING",
+    });
+  }
+
+  const topStylistsData = await prisma.booking.groupBy({
+    by: ["stylistId"],
+    where: { status: { in: ["CONFIRMED", "COMPLETED"] } },
+    _count: { id: true },
+    orderBy: { _count: { id: "desc" } },
+    take: 5,
+  });
+
+  const topStylists = await Promise.all(
+    topStylistsData.map(async (t) => {
+      const stylist = await prisma.stylist.findUnique({
+        where: { id: t.stylistId },
+        include: { profile: { select: { fullName: true } } },
+      });
+      return {
+        name: stylist?.profile.fullName ?? "Unknown",
+        bookings: t._count.id,
+        revenue: "£0",
+        rating: 4.8,
+      };
+    })
+  );
+
+  const weeklyRevenue = [62, 75, 58, 90, 84, 110, 96];
+
   return (
     <div className="space-y-8 animate-fade-in">
       <PageHeader
         eyebrow="Overview"
         title="Admin Dashboard"
-        description={`${new Date().toLocaleDateString("en-NG", {weekday:"long", month:"long", day:"numeric", year:"numeric"})}`}
+        description={`${new Date().toLocaleDateString("en-NG", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}`}
         actions={
           <Button asChild size="sm">
             <Link href="/admin/bookings"><CalendarDays className="h-4 w-4" /> All Bookings</Link>
@@ -55,7 +103,6 @@ export default function AdminDashboardPage() {
         }
       />
 
-      {/* Alerts */}
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((a, i) => (
@@ -73,34 +120,30 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Today's Bookings" value="18"      change={12}  icon={<CalendarDays className="h-5 w-5 text-gold"/>}  accent />
-        <StatCard label="Monthly Revenue"  value="£92k"  change={9}   icon={<TrendingUp   className="h-5 w-5 text-mist"/>} />
-        <StatCard label="Active Clients"   value="3,241"  change={5}   icon={<Users        className="h-5 w-5 text-mist"/>} />
-        <StatCard label="Active Stylists"  value="6"                    icon={<Scissors     className="h-5 w-5 text-mist"/>} />
+        <StatCard label="Today's Bookings" value={todayBookings} change={12} icon={<CalendarDays className="h-5 w-5 text-gold" />} accent />
+        <StatCard label="Monthly Revenue" value="£92k" change={9} icon={<TrendingUp className="h-5 w-5 text-mist" />} />
+        <StatCard label="Active Clients" value={totalCustomers} change={5} icon={<Users className="h-5 w-5 text-mist" />} />
+        <StatCard label="Active Stylists" value={totalStylists} icon={<Scissors className="h-5 w-5 text-mist" />} />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-
-        {/* Revenue trend */}
         <Card variant="elevated" className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Revenue — This Week</CardTitle>
             <span className="font-display text-2xl text-gold-light">£92k</span>
           </CardHeader>
           <CardContent>
-            {/* Simple bar chart */}
             <div className="flex items-end gap-2 h-32">
               {weeklyRevenue.map((v, i) => {
-                const days = ["M","T","W","T","F","S","S"];
-                const max  = Math.max(...weeklyRevenue);
-                const pct  = (v / max) * 100;
+                const days = ["M", "T", "W", "T", "F", "S", "S"];
+                const max = Math.max(...weeklyRevenue);
+                const pct = (v / max) * 100;
                 const isToday = i === new Date().getDay() - 1;
                 return (
                   <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
                     <div className="w-full rounded-t-lg transition-all relative overflow-hidden"
-                      style={{ height:`${pct}%`, background: isToday ? "linear-gradient(to top, #7A5C2E, #C9973B)" : "#2C2C2C" }}>
+                      style={{ height: `${pct}%`, background: isToday ? "linear-gradient(to top, #7A5C2E, #C9973B)" : "#2C2C2C" }}>
                       {isToday && <div className="absolute inset-0 bg-gold/10" />}
                     </div>
                     <span className={`font-body text-2xs ${isToday ? "text-gold" : "text-ash"}`}>{days[i]}</span>
@@ -111,7 +154,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Top stylists */}
         <Card variant="elevated">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Top Stylists</CardTitle>
@@ -123,7 +165,7 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               {topStylists.map((s, i) => (
                 <div key={s.name} className="flex items-center gap-3">
-                  <span className={`font-mono text-xs w-4 ${i === 0 ? "text-gold" : "text-ash"}`}>#{i+1}</span>
+                  <span className={`font-mono text-xs w-4 ${i === 0 ? "text-gold" : "text-ash"}`}>#{i + 1}</span>
                   <Avatar name={s.name} size="sm" />
                   <div className="flex-1 min-w-0">
                     <p className="font-body text-sm text-pearl truncate">{s.name}</p>
@@ -142,7 +184,6 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* Recent bookings */}
       <Card variant="elevated" className="p-0 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
           <CardTitle>Recent Bookings</CardTitle>
@@ -151,18 +192,18 @@ export default function AdminDashboardPage() {
           </Button>
         </div>
         <div className="divide-y divide-white/[0.04]">
-          {recentBookings.map(b => (
+          {recentBookings.map((b) => (
             <div key={b.id} className="flex items-center gap-4 px-6 py-3.5 hover:bg-smoke/40 transition-colors flex-wrap">
-              <Avatar name={b.customer} size="sm" />
+              <Avatar name={b.customer.fullName} size="sm" />
               <div className="flex-1 min-w-0">
-                <p className="font-body text-sm text-pearl">{b.customer}</p>
-                <p className="font-body text-xs text-mist">{b.service} · {b.stylist}</p>
+                <p className="font-body text-sm text-pearl">{b.customer.fullName}</p>
+                <p className="font-body text-xs text-mist">{b.service.name} · {b.stylist.profile.fullName}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="font-mono text-xs text-silver">{formatTime(b.startAt)}</p>
                 <p className="font-body text-2xs text-ash">{formatDate(b.startAt)}</p>
               </div>
-              <span className="font-display text-lg text-gold-light shrink-0">£{b.price.toLocaleString()}</span>
+              <span className="font-display text-lg text-gold-light shrink-0">£{Number(b.service.price).toLocaleString()}</span>
               <Badge variant={statusVariant[b.status]}>{b.status.toLowerCase()}</Badge>
             </div>
           ))}
