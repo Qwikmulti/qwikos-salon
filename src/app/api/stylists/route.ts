@@ -26,13 +26,16 @@ const updateSchema = z.object({
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const serviceId = searchParams.get("serviceId");
+  const all = searchParams.get("all");
 
   const stylists = await prisma.stylist.findMany({
     where: {
-      isActive: true,
+      ...(all !== "true" ? { isActive: true } : {}),
       ...(serviceId ? { services: { some: { serviceId } } } : {}),
     },
-    include: { profile: { select: { fullName: true, email: true, avatarUrl: true } } },
+    include: { 
+      profile: { select: { fullName: true, email: true, avatarUrl: true, phone: true } },
+    },
     orderBy: { createdAt: "asc" },
   });
 

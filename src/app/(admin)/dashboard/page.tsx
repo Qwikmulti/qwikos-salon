@@ -73,7 +73,7 @@ export default async function AdminDashboardPage() {
     take: 5,
   });
 
-  const topStylists = await Promise.all(
+const topStylists = await Promise.all(
     topStylistsData.map(async (t) => {
       const stylist = await prisma.stylist.findUnique({
         where: { id: t.stylistId },
@@ -88,7 +88,21 @@ export default async function AdminDashboardPage() {
     })
   );
 
-  const weeklyRevenue = [62, 75, 58, 90, 84, 110, 96];
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekBookings = await prisma.booking.findMany({
+    where: { startAt: { gte: weekAgo } },
+    select: { startAt: true },
+  });
+
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const revenueByDay = Array(7).fill(0);
+  weekBookings.forEach(b => {
+    const day = new Date(b.startAt).getDay();
+    revenueByDay[day]++;
+  });
+  const maxDay = Math.max(...revenueByDay, 1);
+  const weeklyRevenue = revenueByDay.map(v => Math.round((v / maxDay) * 100));
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -136,7 +150,7 @@ export default async function AdminDashboardPage() {
           <CardContent>
             <div className="flex items-end gap-2 h-32">
               {weeklyRevenue.map((v, i) => {
-                const days = ["M", "T", "W", "T", "F", "S", "S"];
+                const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
                 const max = Math.max(...weeklyRevenue);
                 const pct = (v / max) * 100;
                 const isToday = i === new Date().getDay() - 1;

@@ -38,14 +38,9 @@ const DEFAULT_SCHEDULE: Record<DayKey, DaySchedule> = {
   SUNDAY:    { start:"10:00", end:"14:00", active:false },
 };
 
-const MOCK_BLOCKED: BlockedSlot[] = [
-  { id:"bl1", date: format(addDays(new Date(),3), "yyyy-MM-dd"), start:"12:00", end:"13:00", reason:"Lunch break" },
-  { id:"bl2", date: format(addDays(new Date(),7), "yyyy-MM-dd"), start:"09:00", end:"17:00", reason:"Personal day" },
-];
-
 export default function StylistAvailabilityPage() {
   const [schedule,  setSchedule]  = useState<Record<DayKey, DaySchedule>>(DEFAULT_SCHEDULE);
-  const [blocked,   setBlocked]   = useState<BlockedSlot[]>(MOCK_BLOCKED);
+  const [blocked,   setBlocked]   = useState<BlockedSlot[]>([]);
   const [blockOpen, setBlockOpen] = useState(false);
   const [saving,    setSaving]    = useState(false);
 
