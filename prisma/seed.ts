@@ -1,4 +1,4 @@
-import { prisma } from "../src/lib/prisma/client";
+import { getPrisma } from "../src/lib/prisma/client";
 
 const ADMIN_ID = "seed-admin-001";
 const STYLIST_1_ID = "seed-stylist-001";
@@ -6,6 +6,7 @@ const STYLIST_2_ID = "seed-stylist-002";
 const STYLIST_3_ID = "seed-stylist-003";
 
 async function main() {
+  const prisma = await getPrisma();
   console.log("🌱 Seeding database...");
 
   await prisma.profile.upsert({
@@ -309,5 +310,6 @@ main()
     process.exit(1);
   })
   .finally(async () => {
+    const prisma = await getPrisma();
     await prisma.$disconnect();
   });

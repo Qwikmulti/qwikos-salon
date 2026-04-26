@@ -3,12 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
-
-seed = "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
 
 enum Role {
   CUSTOMER
@@ -232,4 +228,31 @@ model SalonSettings {
   updatedAt       DateTime @updatedAt
 
   @@map("salon_settings")
+}
+
+model ebooks {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  file_url    String
+  file_name   String
+  uploaded_at DateTime @default(now()) @db.Timestamptz(6)
+  is_active   Boolean  @default(true)
+
+  @@index([is_active], map: "idx_ebooks_is_active")
+  @@index([uploaded_at(sort: Desc)], map: "idx_ebooks_uploaded_at")
+  @@map("ebooks")
+}
+
+model subscribers {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  email         String    @unique
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  email_sent    Boolean   @default(false)
+  email_sent_at DateTime? @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)], map: "idx_subscribers_created_at")
+  @@index([email], map: "idx_subscribers_email")
+  @@index([email_sent], map: "idx_subscribers_email_sent")
+  @@map("subscribers")
 }

@@ -46,7 +46,8 @@ export async function updateSession(request: NextRequest) {
 
   // Role-based access control
   if (user) {
-    const profile = await prisma.profile.findUnique({ where: { id: user.id } });
+    const prismaClient = await prisma;
+    const profile = await prismaClient.profile.findUnique({ where: { id: user.id } });
     const userRole = profile?.role ?? "CUSTOMER";
 
     // Admin-only routes - redirect non-admins

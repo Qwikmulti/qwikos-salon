@@ -63,14 +63,14 @@ CREATE POLICY "Services admin upload"
   ON storage.objects FOR INSERT
   WITH CHECK (
     bucket_id = 'services' AND
-    auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN')
+    EXISTS (SELECT 1 FROM profiles WHERE profiles.id = (auth.uid())::text AND profiles.role = 'ADMIN')
   );
 
 CREATE POLICY "Services admin delete"
   ON storage.objects FOR DELETE
   USING (
     bucket_id = 'services' AND
-    auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN')
+    EXISTS (SELECT 1 FROM profiles WHERE profiles.id = (auth.uid())::text AND profiles.role = 'ADMIN')
   );
 
 -- BLOG: admin only
@@ -81,14 +81,14 @@ CREATE POLICY "Blog admin upload"
   ON storage.objects FOR INSERT
   WITH CHECK (
     bucket_id = 'blog' AND
-    auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN')
+    EXISTS (SELECT 1 FROM profiles WHERE profiles.id = (auth.uid())::text AND profiles.role = 'ADMIN')
   );
 
 CREATE POLICY "Blog admin delete"
   ON storage.objects FOR DELETE
   USING (
     bucket_id = 'blog' AND
-    auth.uid() IN (SELECT id FROM profiles WHERE role = 'ADMIN')
+    EXISTS (SELECT 1 FROM profiles WHERE profiles.id = (auth.uid())::text AND profiles.role = 'ADMIN')
   );
 
 -- ── 3. Prisma schema additions ────────────────────────────────
