@@ -49,7 +49,7 @@ export default async function AdminDashboardPage() {
       orderBy: { createdAt: "desc" },
       include: {
         customer: { select: { fullName: true } },
-        stylist: { include: { profile: { select: { fullName: true } } },
+        stylist: { include: { profile: { select: { fullName: true } } } },
         service: { select: { name: true, price: true } },
       },
     }),

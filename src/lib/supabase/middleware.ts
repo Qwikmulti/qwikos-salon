@@ -1,6 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { prisma } from "@/lib/prisma/client";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -42,32 +41,6 @@ export async function updateSession(request: NextRequest) {
 
   if (user && isAuth) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  // Role-based access control
-  if (user) {
-    const prismaClient = await prisma;
-    const profile = await prismaClient.profile.findUnique({ where: { id: user.id } });
-    const userRole = profile?.role ?? "CUSTOMER";
-
-    // Admin-only routes - redirect non-admins
-    if (isAdmin && userRole !== "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // Stylist-only routes - redirect non-stylists
-    if (isStylist && userRole !== "STYLIST") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // Customer routes - only customers allowed (not stylists or admins)
-    if (path.startsWith("/dashboard") && userRole === "STYLIST") {
-      return NextResponse.redirect(new URL("/stylist/dashboard", request.url));
-    }
-
-    if (path.startsWith("/dashboard") && userRole === "ADMIN") {
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-    }
   }
 
   return supabaseResponse;

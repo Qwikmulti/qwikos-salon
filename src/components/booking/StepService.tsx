@@ -43,7 +43,7 @@ export function StepService({ selected, onSelect }: Props) {
     return matchQ && matchC;
   });
 
-  const categories = ["ALL", ...Array.from(new Set(services.map(s => s.category))] as Array<ServiceCategory | "ALL">;
+  const categories = ["ALL", ...Array.from(new Set(services.map(s => s.category)))] as Array<ServiceCategory | "ALL">;
 
   return (
     <div>

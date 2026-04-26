@@ -27,14 +27,13 @@ export default async function AnalyticsPage() {
     prisma.booking.count(),
     prisma.booking.aggregate({
       where: { status: { in: ["CONFIRMED", "COMPLETED"] } },
-      _sum: { startAt: true },
     }),
     prisma.booking.findMany({
       take: 10,
       orderBy: { createdAt: "desc" },
       include: {
         customer: { select: { fullName: true } },
-        stylist: { include: { profile: { select: { fullName: true } } },
+        stylist: { include: { profile: { select: { fullName: true } } } },
         service: { select: { name: true } },
       },
     }),
