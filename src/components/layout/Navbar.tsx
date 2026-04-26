@@ -52,7 +52,7 @@ export function Navbar() {
               key={href}
               href={href}
               className={cn(
-                "px-3.5 py-2 rounded-lg font-body text-sm transition-all duration-150",
+                "px-3.5 py-2 rounded-lg font-body text-sm transition-all duration-150 drop-shadow-sm",
                 pathname === href || (href !== "/" && pathname.startsWith(href))
                   ? "text-gold-light bg-gold/8 border border-gold/15"
                   : "text-silver hover:text-pearl hover:bg-smoke",
