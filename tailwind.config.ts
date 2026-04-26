@@ -1,0 +1,97 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: "class",
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        obsidian:  "#0A0A0A",
+        charcoal:  "#141414",
+        graphite:  "#1E1E1E",
+        smoke:     "#2C2C2C",
+        ash:       "#3D3D3D",
+        mist:      "#8A8A8A",
+        silver:    "#B8B8B8",
+        pearl:     "#E8E4DC",
+        ivory:     "#F5F2EC",
+        gold: {
+          DEFAULT: "#C9973B",
+          deep:    "#7A5C2E",
+          light:   "#E8C06A",
+          glow:    "#F0D080",
+        },
+        success: { DEFAULT: "#2D6A4F", bg: "#1A3329", text: "#52B788" },
+        warning: { DEFAULT: "#C9973B", bg: "#2E2210", text: "#E8C06A" },
+        danger:  { DEFAULT: "#8B2635", bg: "#2A1218", text: "#E57373" },
+        info:    { DEFAULT: "#2B6CB0", bg: "#162132", text: "#63B3ED" },
+      },
+      fontFamily: {
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
+        heading:  ["var(--font-dm-serif)", "Georgia", "serif"],
+        body:     ["var(--font-jost)", "Helvetica Neue", "sans-serif"],
+        mono:     ["var(--font-jetbrains)", "Courier New", "monospace"],
+      },
+      fontSize: {
+        "2xs": ["10px", { lineHeight: "14px", letterSpacing: "0.08em" }],
+        "xs":  ["11px", { lineHeight: "16px", letterSpacing: "0.06em" }],
+        "sm":  ["12px", { lineHeight: "18px" }],
+        "base":["14px", { lineHeight: "22px" }],
+        "md":  ["16px", { lineHeight: "26px" }],
+        "lg":  ["18px", { lineHeight: "28px" }],
+        "xl":  ["22px", { lineHeight: "30px" }],
+        "2xl": ["28px", { lineHeight: "36px", letterSpacing: "-0.01em" }],
+        "3xl": ["36px", { lineHeight: "44px", letterSpacing: "-0.015em" }],
+        "4xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em" }],
+        "5xl": ["64px", { lineHeight: "72px", letterSpacing: "-0.025em" }],
+        "6xl": ["80px", { lineHeight: "88px", letterSpacing: "-0.03em" }],
+      },
+      borderRadius: {
+        sm:    "4px",
+        md:    "8px",
+        DEFAULT:"10px",
+        lg:    "12px",
+        xl:    "16px",
+        "2xl": "24px",
+        "3xl": "32px",
+        full:  "9999px",
+      },
+      boxShadow: {
+        sm:    "0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.5)",
+        md:    "0 4px 16px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4)",
+        lg:    "0 8px 32px rgba(0,0,0,0.6), 0 4px 8px rgba(0,0,0,0.5)",
+        gold:  "0 0 24px rgba(201,151,59,0.25), 0 4px 16px rgba(0,0,0,0.4)",
+        glow:  "0 0 40px rgba(201,151,59,0.15), 0 0 80px rgba(201,151,59,0.05)",
+      },
+      keyframes: {
+        fadeUp:    { "0%": { opacity: "0", transform: "translateY(16px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
+        fadeIn:    { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
+        shimmer:   { "0%": { backgroundPosition: "-200% center" }, "100%": { backgroundPosition: "200% center" } },
+        pulseGold: { "0%, 100%": { boxShadow: "0 0 0 0 rgba(201,151,59,0.3)" }, "50%": { boxShadow: "0 0 0 8px rgba(201,151,59,0)" } },
+        slideIn:   { "0%": { opacity: "0", transform: "translateX(-16px)" }, "100%": { opacity: "1", transform: "translateX(0)" } },
+        scaleIn:   { "0%": { opacity: "0", transform: "scale(0.95)" }, "100%": { opacity: "1", transform: "scale(1)" } },
+      },
+      animation: {
+        "fade-up":    "fadeUp 0.5s ease both",
+        "fade-in":    "fadeIn 0.3s ease both",
+        "slide-in":   "slideIn 0.4s ease both",
+        "scale-in":   "scaleIn 0.25s ease both",
+        "shimmer":    "shimmer 3s linear infinite",
+        "pulse-gold": "pulseGold 2s ease-in-out infinite",
+      },
+      backgroundImage: {
+        "gold-gradient": "linear-gradient(135deg, #7A5C2E, #C9973B, #E8C06A)",
+        "gold-shimmer":  "linear-gradient(90deg, #7A5C2E 0%, #F0D080 50%, #7A5C2E 100%)",
+        "dark-gradient": "linear-gradient(180deg, #141414 0%, #0A0A0A 100%)",
+        "card-gradient": "linear-gradient(135deg, rgba(122,92,46,0.15), rgba(201,151,59,0.08))",
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
