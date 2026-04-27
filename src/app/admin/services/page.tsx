@@ -120,7 +120,7 @@ export default function AdminServicesPage() {
               <div className="flex items-center justify-between pt-4 border-t border-white/[0.04]">
                 <div className="flex flex-col">
                   <span className="font-body text-[10px] text-ash uppercase tracking-widest mb-0.5">Price</span>
-                  <span className="font-display text-lg text-gold-light font-medium">£{s.price}</span>
+                  <span className="font-display text-lg text-gold-light font-medium">£{s.price / 100}</span>
                 </div>
                 <div className="flex flex-col items-end">
                   <span className="font-body text-[10px] text-ash uppercase tracking-widest mb-0.5">Time</span>

@@ -15,6 +15,7 @@ import {
   CalendarDays, Clock, TrendingUp, Users,
   ChevronRight, CheckCircle2, XCircle, Scissors,
 } from "lucide-react";
+import { RefreshButton } from "@/components/stylist/RefreshButton";
 
 export const metadata: Metadata = { title: "Stylist Dashboard" };
 
@@ -102,9 +103,7 @@ export default async function StylistDashboardPage() {
           <Button variant="outline-gold" asChild>
             <Link href="/stylist/profile">Complete your Profile</Link>
           </Button>
-          <Button variant="ghost" onClick={() => window.location.reload()}>
-            Refresh Status
-          </Button>
+          <RefreshButton />
         </div>
       </div>
     );

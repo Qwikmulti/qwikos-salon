@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils/cn";
 import type { ReactNode } from "react";
 import { Button } from "./button";
+import Link from "next/link";
 
 interface EmptyStateProps {
   icon?:        ReactNode;
   title:        string;
   description?: string;
-  action?:      { label: string; onClick: () => void };
+  action?:      { label: string; onClick?: () => void; href?: string };
   className?:   string;
 }
 
@@ -26,7 +27,13 @@ export function EmptyState({ icon, title, description, action, className }: Empt
         <p className="font-body text-sm text-mist max-w-xs mb-6">{description}</p>
       )}
       {action && (
-        <Button size="sm" onClick={action.onClick}>{action.label}</Button>
+        <Button size="sm" onClick={action.onClick} asChild={!!action.href}>
+          {action.href ? (
+            <Link href={action.href}>{action.label}</Link>
+          ) : (
+            action.label
+          )}
+        </Button>
       )}
     </div>
   );

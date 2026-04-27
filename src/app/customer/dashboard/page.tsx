@@ -69,7 +69,7 @@ export default async function CustomerDashboardPage() {
                 icon={<CalendarDays className="h-7 w-7 text-mist" />}
                 title="No upcoming bookings"
                 description="Book your next appointment and it'll appear here."
-                action={{ label: "Book Now", onClick: () => {} }}
+                action={{ label: "Book Now", href: "/book" }}
               />
             </Card>
           ) : (

@@ -49,7 +49,7 @@ export default function EditServicePage({ params }: { params: Promise<{ id: stri
             name: s.name,
             category: s.category,
             durationMin: String(s.durationMin),
-            price: String(s.price),
+            price: String(s.price / 100),
             description: s.description ?? "",
             isActive: s.isActive,
             imageUrl: s.imageUrl,

@@ -49,7 +49,11 @@ export default function StylistServicesPage() {
       const res = await fetch("/api/stylists/services");
       if (!res.ok) throw new Error("Failed to fetch services");
       const data = await res.json();
-      setServices(data.services || []);
+      setServices((data.services || []).map((s: any) => ({
+        ...s,
+        price: s.price / 100,
+        priceOverride: s.priceOverride ? s.priceOverride / 100 : null,
+      })));
     } catch (error) {
       console.error("Error fetching services:", error);
       toast.error("Failed to load services");
@@ -264,7 +268,7 @@ export default function StylistServicesPage() {
                           : ""}
                       </span>
                       <span className="font-body text-2xs text-mist">
-                        Base: £{(service.price / 100).toFixed(2)}
+                        Base: £{service.price.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -273,7 +277,7 @@ export default function StylistServicesPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <div className="w-24">
                         <Input
-                          placeholder={`£${(service.price / 100).toFixed(2)}`}
+                          placeholder={`£${service.price.toFixed(2)}`}
                           value={service.priceOverride ?? ""}
                           onChange={(e) => setPriceOverride(service.id, e.target.value)}
                           icon={<span className="text-mist text-xs">£</span>}

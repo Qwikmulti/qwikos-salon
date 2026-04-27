@@ -100,7 +100,7 @@ export default async function ServicePage({ params }: Props) {
                 <div className="space-y-1">
                   <p className="font-body text-2xs uppercase tracking-widest text-ash">Investment</p>
                   <p className="font-display text-2xl text-gold-light">
-                    £{Number(s.price).toFixed(0)}
+                    £{(Number(s.price) / 100).toFixed(0)}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -215,7 +215,7 @@ export default async function ServicePage({ params }: Props) {
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-sm">
                   <span className="text-mist">Base Price</span>
-                  <span className="text-white">£{Number(s.price).toFixed(0)}</span>
+                  <span className="text-white">£{(Number(s.price) / 100).toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-mist">Duration</span>
@@ -223,7 +223,7 @@ export default async function ServicePage({ params }: Props) {
                 </div>
                 <div className="pt-4 border-t border-white/10 flex justify-between">
                   <span className="text-gold font-medium uppercase tracking-widest text-xs">Total</span>
-                  <span className="text-gold-light font-display text-xl">From £{Number(s.price).toFixed(0)}</span>
+                  <span className="text-gold-light font-display text-xl">From £{(Number(s.price) / 100).toFixed(0)}</span>
                 </div>
               </div>
 

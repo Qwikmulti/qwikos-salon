@@ -158,7 +158,7 @@ export default function AdminBookingsPage() {
                 <span className="font-body text-sm text-silver truncate">{b.stylist.profile.fullName}</span>
                 <span className="font-mono text-xs text-silver">{formatDate(new Date(b.startAt))}</span>
                 <span className="font-mono text-xs text-silver">{formatTime(new Date(b.startAt))}</span>
-                <span className="font-display text-base text-gold-light">£{(Number(b.service.price) / 1000).toFixed(0)}k</span>
+                <span className="font-display text-base text-gold-light">£{(Number(b.service.price) / 100).toFixed(0)}</span>
                 <div className="flex items-center gap-2">
                   <Badge variant={statusVariant[b.status]}>{b.status.charAt(0) + b.status.slice(1).toLowerCase()}</Badge>
                   {["PENDING", "CONFIRMED"].includes(b.status) && (

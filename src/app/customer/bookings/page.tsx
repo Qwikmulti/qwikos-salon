@@ -74,7 +74,7 @@ export default function BookingsPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-display text-lg text-gold-light">£{Number(b.service.price).toLocaleString()}</span>
+          <span className="font-display text-lg text-gold-light">£{(Number(b.service.price) / 100).toLocaleString()}</span>
           <Badge variant={statusVariant[b.status]}>{b.status.toLowerCase()}</Badge>
         </div>
       </div>

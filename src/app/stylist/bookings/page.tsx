@@ -118,7 +118,7 @@ export default function StylistBookingsPage() {
         </div>
       </div>
       <div className="flex items-center gap-3 shrink-0 flex-wrap">
-        <span className="font-display text-lg text-gold-light">£{Number(b.service.price).toLocaleString()}</span>
+        <span className="font-display text-lg text-gold-light">£{(Number(b.service.price) / 100).toLocaleString()}</span>
         <Badge variant={statusCfg[b.status].variant}>{statusCfg[b.status].label}</Badge>
         {b.status === "PENDING" && (
           <div className="flex gap-2">

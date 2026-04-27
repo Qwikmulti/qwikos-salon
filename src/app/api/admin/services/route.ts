@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         name,
         category,
         durationMin: Number(durationMin),
-        price: Number(price),
+        price: Number(price) * 100,
         description,
         isActive: isActive ?? true,
         imageUrl,

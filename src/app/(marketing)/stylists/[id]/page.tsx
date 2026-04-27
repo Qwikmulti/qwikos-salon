@@ -165,7 +165,7 @@ export default async function StylistPage({ params }: Props) {
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="font-display text-xl text-gold-light">£{Number(svc.price).toFixed(0)}</span>
+                      <span className="font-display text-xl text-gold-light">£{(Number(svc.price) / 100).toFixed(0)}</span>
                       <Button size="sm" variant="ghost" asChild
                         className="opacity-0 group-hover:opacity-100 transition-all">
                         <Link href={`/book?stylist=${id}`}>

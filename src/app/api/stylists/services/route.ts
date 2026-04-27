@@ -173,7 +173,7 @@ export async function PATCH(req: NextRequest) {
             return prisma.stylistService.update({
               where: { id: existingCustom.id },
               data: {
-                priceOverride: priceOverride ?? null,
+                priceOverride: priceOverride ? priceOverride * 100 : null,
                 durationOverride: durationOverride ?? null,
                 service: {
                   update: {
@@ -189,7 +189,7 @@ export async function PATCH(req: NextRequest) {
             return prisma.stylistService.create({
               data: {
                 stylist: { connect: { id: stylist.id } },
-                priceOverride: priceOverride ?? null,
+                priceOverride: priceOverride ? priceOverride * 100 : null,
                 durationOverride: durationOverride ?? null,
                 service: {
                   create: {
@@ -197,7 +197,7 @@ export async function PATCH(req: NextRequest) {
                     description: customDescription,
                     category: (category as any) || "OTHER",
                     durationMin: durationOverride || 60,
-                    price: priceOverride || 0,
+                    price: priceOverride ? priceOverride * 100 : 0,
                     isActive: true,
                     isCustom: true,
                   } as any,
@@ -227,7 +227,7 @@ export async function PATCH(req: NextRequest) {
             return prisma.stylistService.update({
               where: { id: existing.id },
               data: {
-                priceOverride: priceOverride ?? null,
+                priceOverride: priceOverride ? priceOverride * 100 : null,
                 durationOverride: durationOverride ?? null,
               },
             });
@@ -237,7 +237,7 @@ export async function PATCH(req: NextRequest) {
               data: {
                 stylistId: stylist.id,
                 serviceId: serviceId,
-                priceOverride: priceOverride ?? null,
+                priceOverride: priceOverride ? priceOverride * 100 : null,
                 durationOverride: durationOverride ?? null,
               },
             });

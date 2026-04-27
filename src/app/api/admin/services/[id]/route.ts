@@ -38,7 +38,7 @@ export async function PATCH(
         name,
         category,
         durationMin: durationMin !== undefined ? Number(durationMin) : undefined,
-        price: price !== undefined ? Number(price) : undefined,
+        price: price !== undefined ? Number(price) * 100 : undefined,
         description,
         isActive,
         imageUrl,

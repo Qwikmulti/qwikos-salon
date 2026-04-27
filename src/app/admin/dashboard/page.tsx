@@ -217,7 +217,7 @@ const topStylists = await Promise.all(
                 <p className="font-mono text-xs text-silver">{formatTime(b.startAt)}</p>
                 <p className="font-body text-2xs text-ash">{formatDate(b.startAt)}</p>
               </div>
-              <span className="font-display text-lg text-gold-light shrink-0">£{Number(b.service.price).toLocaleString()}</span>
+              <span className="font-display text-lg text-gold-light shrink-0">£{(Number(b.service.price) / 100).toLocaleString()}</span>
               <Badge variant={statusVariant[b.status]}>{b.status.toLowerCase()}</Badge>
             </div>
           ))}
