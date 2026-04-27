@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const createBookingSchema = z.object({
-  stylistId: z.string().uuid("Invalid stylist"),
-  serviceId: z.string().uuid("Invalid service"),
+  stylistId: z.string().min(1, "Invalid stylist"),
+  serviceId: z.string().min(1, "Invalid service"),
   startAt:   z.string().datetime("Invalid date/time"),
   notes:     z.string().max(500).optional(),
 });
