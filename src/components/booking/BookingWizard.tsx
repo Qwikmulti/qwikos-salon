@@ -34,14 +34,14 @@ const slideVariants = {
   exit:  (dir: number) => ({ opacity: 0, x: dir > 0 ? -40 : 40 }),
 };
 
-export function BookingWizard({ initialServiceId }: { initialServiceId?: string }) {
+export function BookingWizard({ initialServiceId, initialStylistId }: { initialServiceId?: string, initialStylistId?: string }) {
   const router = useRouter();
   const { createBooking, loading: bookingLoading } = useBooking();
 
   const [step,      setStep]      = useState(0);
   const [direction, setDirection] = useState(1);
   const [state,     setState]     = useState<BookingState>({
-    service: null, stylistId: null, stylistName: null,
+    service: null, stylistId: initialStylistId || null, stylistName: null,
     date: null, time: null, notes: "",
   });
 
@@ -94,7 +94,8 @@ export function BookingWizard({ initialServiceId }: { initialServiceId?: string 
           {step === 0 && (
             <StepService
               selected={state.service}
-              onSelect={service => { patch({ service, stylistId: null, stylistName: null, date: null, time: null }); next(); }}
+              initialServiceId={initialServiceId}
+              onSelect={service => { patch({ service, date: null, time: null }); next(); }}
             />
           )}
           {step === 1 && (

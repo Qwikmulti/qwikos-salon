@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Book Appointment" };
 interface Props { searchParams: Promise<{ service?: string; stylist?: string }> }
 
 export default async function BookPage({ searchParams }: Props) {
-  const { service } = await searchParams;
+  const { service, stylist } = await searchParams;
   return (
     <section className="min-h-screen bg-charcoal py-8">
       {/* Header banner */}
@@ -22,7 +22,7 @@ export default async function BookPage({ searchParams }: Props) {
           </h1>
         </div>
       </div>
-      <BookingWizard initialServiceId={service} />
+      <BookingWizard initialServiceId={service} initialStylistId={stylist} />
     </section>
   );
 }

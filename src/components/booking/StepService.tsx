@@ -14,20 +14,31 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
 interface Props {
   selected: Service | null;
   onSelect: (service: Service) => void;
+  initialServiceId?: string;
 }
 
-export function StepService({ selected, onSelect }: Props) {
+export function StepService({ selected, onSelect, initialServiceId }: Props) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ServiceCategory | "ALL">("ALL");
+  const [autoSelected, setAutoSelected] = useState(false);
 
   useEffect(() => {
     async function fetchServices() {
       try {
         const res = await fetch("/api/services");
         const data = await res.json();
-        if (data.services) setServices(data.services);
+        if (data.services) {
+          setServices(data.services);
+          if (initialServiceId && !autoSelected) {
+            const initial = data.services.find((s: Service) => s.id === initialServiceId);
+            if (initial) {
+              setAutoSelected(true);
+              onSelect(initial);
+            }
+          }
+        }
       } catch (e) {
         console.error("Failed to load services:", e);
       } finally {
