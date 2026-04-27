@@ -3,6 +3,7 @@
 -- Run this in your Supabase SQL editor (Dashboard → SQL Editor)
 -- ============================================================
 
+
 -- ── 1. Create buckets ────────────────────────────────────────
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES

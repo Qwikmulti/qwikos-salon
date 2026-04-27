@@ -30,6 +30,7 @@ model Stylist {
   specialties       String[]
   yearsExperience   Int                @default(0) @map("years_experience")
   isActive          Boolean            @default(true) @map("is_active")
+  status            StylistStatus      @default(PENDING) @map("status")
   instagramHandle   String?            @map("instagram_handle")
   heroImageUrl      String?            @map("hero_image_url")
   portfolioUrls     String[]           @map("portfolio_urls")
@@ -211,6 +212,12 @@ model subscribers {
   @@index([email], map: "idx_subscribers_email")
   @@index([email_sent], map: "idx_subscribers_email_sent")
   @@map("subscribers")
+}
+
+enum StylistStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum Role {

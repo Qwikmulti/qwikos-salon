@@ -42,7 +42,7 @@ export default async function AdminDashboardPage() {
     prisma.profile.count({ where: { role: "CUSTOMER" } }),
     prisma.stylist.count({ where: { isActive: true } }),
     prisma.booking.count({
-      where: { startAt: { gte: today }, startAt: { lt: tomorrow } },
+      where: { startAt: { gte: today, lt: tomorrow } },
     }),
     prisma.booking.findMany({
       take: 10,

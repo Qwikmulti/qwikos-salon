@@ -7,7 +7,7 @@ const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
 
 const eventSchema = z.object({
   type: z.string(),
-  data: z.record(z.unknown()),
+  data: z.unknown(),
 });
 
 export async function POST(req: NextRequest) {

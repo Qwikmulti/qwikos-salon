@@ -5,12 +5,20 @@ import { StatCard } from "@/components/ui/stat-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
 import {
-  Users, CalendarDays, DollarSign, TrendingUp, Star, Clock, Scissors,
+  Users,
+  CalendarDays,
+  DollarSign,
+  TrendingUp,
+  Star,
+  Clock,
+  Scissors,
 } from "lucide-react";
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const [
@@ -25,7 +33,7 @@ export default async function AnalyticsPage() {
     prisma.profile.count({ where: { role: "CUSTOMER" } }),
     prisma.stylist.count({ where: { isActive: true } }),
     prisma.booking.count(),
-    prisma.booking.aggregate({
+    prisma.booking.count({
       where: { status: { in: ["CONFIRMED", "COMPLETED"] } },
     }),
     prisma.booking.findMany({
@@ -42,13 +50,16 @@ export default async function AnalyticsPage() {
       _count: { status: true },
     }),
     prisma.booking.findMany({
-      where: { startAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+      where: {
+        startAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+      },
       select: { startAt: true },
     }),
   ]);
 
   const totalBookingsThisMonth = monthlyBookings.filter(
-    b => b.startAt >= new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+    (b) =>
+      b.startAt >= new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   ).length;
 
   const avgRating = 4.8;
@@ -85,25 +96,35 @@ export default async function AnalyticsPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card variant="elevated" className="p-6">
-          <h3 className="font-heading text-lg text-white mb-4">Bookings by Status</h3>
+          <h3 className="font-heading text-lg text-white mb-4">
+            Bookings by Status
+          </h3>
           <div className="space-y-3">
-            {bookingsByStatus.map(s => (
+            {bookingsByStatus.map((s) => (
               <div key={s.status} className="flex items-center justify-between">
                 <span className="font-body text-sm text-mist">{s.status}</span>
-                <span className="font-display text-lg text-white">{s._count.status}</span>
+                <span className="font-display text-lg text-white">
+                  {s._count.status}
+                </span>
               </div>
             ))}
           </div>
         </Card>
 
         <Card variant="elevated" className="p-6">
-          <h3 className="font-heading text-lg text-white mb-4">Recent Bookings</h3>
+          <h3 className="font-heading text-lg text-white mb-4">
+            Recent Bookings
+          </h3>
           <div className="space-y-3">
-            {recentBookings.slice(0, 5).map(b => (
+            {recentBookings.slice(0, 5).map((b) => (
               <div key={b.id} className="flex items-center justify-between">
                 <div>
-                  <p className="font-body text-sm text-white">{b.customer.fullName}</p>
-                  <p className="font-body text-xs text-mist">{b.service.name} — {b.stylist.profile.fullName}</p>
+                  <p className="font-body text-sm text-white">
+                    {b.customer.fullName}
+                  </p>
+                  <p className="font-body text-xs text-mist">
+                    {b.service.name} — {b.stylist.profile.fullName}
+                  </p>
                 </div>
                 <span className="font-body text-xs text-gold">{b.status}</span>
               </div>

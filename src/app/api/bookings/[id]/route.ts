@@ -36,13 +36,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   const profile = await prisma.profile.findUnique({ where: { id: user.id } });
   if (!profile) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (
-    profile.role === "CUSTOMER" && booking.customerId !== user.id &&
-    profile.role === "STYLIST" && booking.stylistId !== profile.stylist?.id &&
-    profile.role !== "ADMIN"
-  ) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+   const isCustomer = profile.role === "CUSTOMER" && booking.customerId === user.id;
+   const isStylist = profile.role === "STYLIST" && booking.stylistId === profile.id; // profile.id is the profileId for stylist
+   const isAdmin = profile.role === "ADMIN";
+
+   if (!isCustomer && !isStylist && !isAdmin) {
+     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+   }
 
   return NextResponse.json({ booking });
 }
@@ -69,9 +69,9 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   const profile = await prisma.profile.findUnique({ where: { id: user.id } });
   if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
 
-  const isCustomer = profile.role === "CUSTOMER" && booking.customerId === user.id;
-  const isStylist = profile.role === "STYLIST" && booking.stylistId === profile.stylist?.id;
-  const isAdmin = profile.role === "ADMIN";
+   const isCustomer = profile.role === "CUSTOMER" && booking.customerId === user.id;
+   const isStylist = profile.role === "STYLIST" && booking.stylistId === profile.id;
+   const isAdmin = profile.role === "ADMIN";
 
   if (!isCustomer && !isStylist && !isAdmin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

@@ -20,12 +20,20 @@ const navItems = [
 interface StylistSidebarProps {
   stylistName?:   string;
   avatarUrl?:     string;
+  status?:        "PENDING" | "APPROVED" | "REJECTED";
   collapsed?:     boolean;
   onToggle?:      () => void;
 }
 
-export function StylistSidebar({ stylistName = "Stylist", avatarUrl, collapsed, onToggle }: StylistSidebarProps) {
+export function StylistSidebar({ stylistName = "Stylist", avatarUrl, status = "APPROVED", collapsed, onToggle }: StylistSidebarProps) {
   const pathname = usePathname();
+
+  const filteredNav = navItems.filter(item => {
+    if (status !== "APPROVED") {
+      return item.label === "Dashboard" || item.label === "Profile";
+    }
+    return true;
+  });
 
   return (
     <aside className={cn(
@@ -63,7 +71,7 @@ export function StylistSidebar({ stylistName = "Stylist", avatarUrl, collapsed, 
 
       {/* Nav */}
       <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ label, href, icon: Icon }) => {
+        {filteredNav.map(({ label, href, icon: Icon }) => {
           const active = pathname.startsWith(href);
           const item = (
             <Link

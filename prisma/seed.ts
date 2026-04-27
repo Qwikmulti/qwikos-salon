@@ -138,6 +138,7 @@ async function main() {
       specialties: ["Braiding", "Natural Hair", "Locs"],
       yearsExperience: 7,
       isActive: true,
+      status: "APPROVED",
       instagramHandle: "@fatimahassan",
     },
   });
@@ -152,6 +153,7 @@ async function main() {
       specialties: ["Fades", "Beard", "Locs", "Color"],
       yearsExperience: 5,
       isActive: true,
+      status: "APPROVED",
       instagramHandle: "@emekaStyles",
     },
   });
@@ -166,6 +168,7 @@ async function main() {
       specialties: ["Balayage", "Keratin", "Treatments"],
       yearsExperience: 9,
       isActive: true,
+      status: "APPROVED",
       instagramHandle: "@amaradiallo",
     },
   });

@@ -17,6 +17,9 @@ build/
 
 # prisma
 prisma/migrations/
+prisma/seed.ts
+prisma/storage-setup.sql
+prisma/user-profile-trigger.sql
 
 # misc
 .DS_Store

@@ -6,12 +6,13 @@ import { StylistSidebar } from "./StylistSidebar";
 
 interface DashboardShellProps {
   role:       "admin" | "stylist";
+  status?:    "PENDING" | "APPROVED" | "REJECTED";
   userName?:  string;
   avatarUrl?: string;
   children:   React.ReactNode;
 }
 
-export function DashboardShell({ role, userName, avatarUrl, children }: DashboardShellProps) {
+export function DashboardShell({ role, status, userName, avatarUrl, children }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -27,6 +28,7 @@ export function DashboardShell({ role, userName, avatarUrl, children }: Dashboar
         <StylistSidebar
           stylistName={userName}
           avatarUrl={avatarUrl}
+          status={status}
           collapsed={collapsed}
           onToggle={() => setCollapsed(!collapsed)}
         />

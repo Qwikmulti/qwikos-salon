@@ -53,8 +53,7 @@ export default async function StylistDashboardPage() {
     prisma.booking.findMany({
       where: {
         stylistId,
-        startAt: { gte: today },
-        startAt: { lt: tomorrow },
+        startAt: { gte: today, lt: tomorrow },
       },
       include: {
         customer: { select: { fullName: true } },
@@ -87,6 +86,29 @@ export default async function StylistDashboardPage() {
   ];
 
   const greeting = new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 18 ? "Good afternoon" : "Good evening";
+
+  if (profile.stylist.status !== "APPROVED") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
+        <div className="h-20 w-20 rounded-full bg-gold/10 flex items-center justify-center mb-6">
+          <Clock className="h-10 w-10 text-gold animate-pulse" />
+        </div>
+        <h1 className="font-heading text-3xl text-white mb-3">Approval Pending</h1>
+        <p className="font-body text-mist max-w-md mb-8">
+          Welcome to SalonOS, {profile.fullName}! Your stylist account is currently being reviewed by our administration team.
+          You'll be able to manage your bookings and services once your account is approved.
+        </p>
+        <div className="flex gap-4">
+          <Button variant="outline-gold" asChild>
+            <Link href="/stylist/profile">Complete your Profile</Link>
+          </Button>
+          <Button variant="ghost" onClick={() => window.location.reload()}>
+            Refresh Status
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">

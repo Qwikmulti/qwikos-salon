@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
   const stylists = await prisma.stylist.findMany({
     where: {
-      ...(all !== "true" ? { isActive: true } : {}),
+      ...(all !== "true" ? { isActive: true, status: "APPROVED" } : {}),
       ...(serviceId ? { services: { some: { serviceId } } } : {}),
     },
     include: { 

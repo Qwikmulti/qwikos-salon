@@ -12,6 +12,7 @@ const postSchema = z.object({
   published: z.boolean().optional(),
   coverImageUrl: z.string().nullable().optional(),
   coverImagePath: z.string().nullable().optional(),
+  id: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {
