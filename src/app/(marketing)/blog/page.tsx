@@ -3,7 +3,7 @@ import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma/client";
-import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
+import { pageMeta, JSON_LD, BASE_URL } from "@/lib/seo/metadata";
 import { IMAGES } from "@/lib/utils/images";
 import { ArrowRight, Clock, Calendar } from "lucide-react";
 
@@ -43,7 +43,7 @@ export default async function BlogPage() {
       headline: p.title,
       description: p.excerpt,
       datePublished: p.publishedAt?.toISOString(),
-      url: `https://salonos.co.uk/blog/${p.slug}`,
+      url: `${BASE_URL}/blog/${p.slug}`,
     })),
   };
 

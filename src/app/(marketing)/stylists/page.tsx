@@ -4,7 +4,7 @@ import Image from "next/image";
 import Script from "next/script";
 import { prisma } from "@/lib/prisma/client";
 import { Button } from "@/components/ui/button";
-import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
+import { pageMeta, JSON_LD, BASE_URL } from "@/lib/seo/metadata";
 import { IMAGES } from "@/lib/utils/images";
 import { Star, ArrowRight, Scissors } from "lucide-react";
 
@@ -36,7 +36,7 @@ export default async function StylistsPage() {
         "@type": "Person",
         name: s.profile.fullName,
         jobTitle: s.specialties[0] ?? "Stylist",
-        url: `https://salonos.co.uk/stylists/${s.id}`,
+        url: `${BASE_URL}/stylists/${s.id}`,
       },
     })),
   };

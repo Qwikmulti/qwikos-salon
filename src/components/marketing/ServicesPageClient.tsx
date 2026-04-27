@@ -261,8 +261,10 @@ function ServiceCard({ service }: { service: Service }) {
             Book Now
           </Link>
         </Button>
-        <Button size="sm" variant="ghost" className="px-3 rounded-xl border border-white/5 hover:border-gold/30">
-          <ArrowRight className="h-4 w-4" />
+        <Button size="sm" variant="ghost" className="px-3 rounded-xl border border-white/5 hover:border-gold/30" asChild>
+          <Link href={`/services/${service.id}`}>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </Button>
       </div>
 

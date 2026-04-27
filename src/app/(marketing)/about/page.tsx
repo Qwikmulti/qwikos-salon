@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button }            from "@/components/ui/button";
 import { BookingCTA }        from "@/components/marketing/BookingCTA";
-import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
+import { pageMeta, JSON_LD, BASE_URL } from "@/lib/seo/metadata";
 import { IMAGES }            from "@/lib/utils/images";
 import { Award, Heart, Users, Leaf } from "lucide-react";
 
@@ -37,8 +37,8 @@ export default function AboutPage() {
     <>
       <Script id="schema-breadcrumb" type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD.breadcrumb([
-          { name:"Home", url:"https://salonos.co.uk" },
-          { name:"About", url:"https://salonos.co.uk/about" },
+          { name:"Home", url: BASE_URL },
+          { name:"About", url: `${BASE_URL}/about` },
         ])) }}
       />
 

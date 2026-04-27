@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE_URL   = process.env.NEXT_PUBLIC_APP_URL ?? "https://salonos.co.uk";
+export const BASE_URL   = process.env.NEXT_PUBLIC_APP_URL ?? "https://salonos.co.uk";
 const SALON_NAME = "SalonOS";
 const TAGLINE    = "London's Premier Unisex Salon";
 const DESC       = "SalonOS is London's most trusted luxury unisex salon in Notting Hill & Chelsea. Expert stylists for every hair type, texture, and identity. Book online in under 2 minutes.";

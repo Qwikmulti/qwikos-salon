@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button }   from "@/components/ui/button";
-import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
+import { pageMeta, JSON_LD, BASE_URL } from "@/lib/seo/metadata";
 import { IMAGES }   from "@/lib/utils/images";
 import { ArrowLeft, Clock, Calendar, Tag, ArrowRight } from "lucide-react";
 
@@ -83,8 +83,8 @@ export default async function BlogPostPage({ params }: Props) {
     image: post.coverImg,
     datePublished: post.date,
     author: { "@type": "Person", name: post.author, jobTitle: post.authorRole },
-    publisher: { "@type": "Organization", name: "SalonOS", url: "https://salonos.co.uk" },
-    url: `https://salonos.co.uk/blog/${slug}`,
+    publisher: { "@type": "Organization", name: "SalonOS", url: BASE_URL },
+    url: `${BASE_URL}/blog/${slug}`,
     keywords: post.tags.join(", "),
   };
 
@@ -94,9 +94,9 @@ export default async function BlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLD) }} />
       <Script id="schema-breadcrumb" type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD.breadcrumb([
-          { name:"Home",  url:"https://salonos.co.uk" },
-          { name:"Blog",  url:"https://salonos.co.uk/blog" },
-          { name: post.title, url: `https://salonos.co.uk/blog/${slug}` },
+          { name:"Home",  url: BASE_URL },
+          { name:"Blog",  url: `${BASE_URL}/blog` },
+          { name: post.title, url: `${BASE_URL}/blog/${slug}` },
         ])) }} />
 
       {/* Hero — full bleed cover */}

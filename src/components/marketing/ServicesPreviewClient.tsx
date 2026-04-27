@@ -61,7 +61,7 @@ export function ServicesPreviewClient({ services }: ServicesPreviewClientProps) 
                 transition={{ delay: i * 0.1 }}
               >
                 <Link
-                  href={`/${slug}`}
+                  href={`/services/${s.id}`}
                   className="group block bg-graphite border border-ash/30 rounded-2xl overflow-hidden hover:border-gold/30 transition-all"
                 >
                   <div className="relative h-48">
