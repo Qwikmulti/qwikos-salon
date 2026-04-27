@@ -5,6 +5,7 @@ import { BookingCTA } from "@/components/marketing/BookingCTA";
 import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
 import { IMAGES } from "@/lib/utils/images";
 import { ServicesPageClient } from "@/components/marketing/ServicesPageClient";
+import { motion } from "framer-motion";
 
 export const metadata: Metadata = pageMeta({
   title: "Hair & Beauty Services — Prices & Durations",
@@ -33,25 +34,57 @@ export default async function ServicesPage() {
   const services = await getServices();
 
   return (
-    <main className="bg-charcoal min-h-screen">
+    <main className="bg-charcoal min-h-screen relative overflow-hidden">
       <Script
         id="json-ld-local-business"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD.localBusiness) }}
       />
 
+      {/* Aesthetic Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold/10 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] bg-white/5 blur-[100px] rounded-full" />
+      </div>
+
       {/* Static Hero Section */}
-      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
-        <div className="absolute inset-0 noise-overlay opacity-30" />
-        <div className="absolute inset-0 bg-card-gradient opacity-40" />
-        <div className="max-w-7xl mx-auto relative text-center">
-          <p className="font-body text-xs uppercase tracking-widest text-gold mb-6">Our Services</p>
-          <h1 className="font-display text-6xl md:text-8xl text-white mb-8 tracking-tight">
-            The <em className="not-italic text-gold-shimmer">Menu</em>
-          </h1>
-          <p className="font-body text-lg text-mist max-w-2xl mx-auto leading-relaxed">
-            From precision cuts to luxury braids. Discover our full range of services with transparent pricing and durations.
-          </p>
+      <section className="relative pt-40 pb-24 px-6 overflow-hidden">
+        <div className="absolute inset-0 noise-overlay opacity-40" />
+        <div className="absolute inset-0 bg-card-gradient opacity-60" />
+        
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-center"
+          >
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <span className="h-px w-8 bg-gold/50" />
+              <p className="font-body text-xs uppercase tracking-[0.4em] text-gold font-bold">The Experience</p>
+              <span className="h-px w-8 bg-gold/50" />
+            </div>
+            
+            <h1 className="font-display text-7xl md:text-9xl text-white mb-10 tracking-tighter leading-none">
+              Luxury <br />
+              <em className="not-italic text-gold-shimmer relative inline-block">
+                Artistry
+                <motion.span 
+                  initial={{ width: 0 }}
+                  animate={{ width: '100%' }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                  className="absolute bottom-4 left-0 h-1 bg-gold/30 rounded-full"
+                />
+              </em>
+            </h1>
+            
+            <p className="font-body text-xl text-mist max-w-2xl mx-auto leading-relaxed opacity-90">
+              Discover a curated selection of world-class hair treatments. 
+              From precision tailoring to avant-garde protective styles, 
+              we redefine the standard of salon excellence.
+            </p>
+          </motion.div>
         </div>
       </section>
 
