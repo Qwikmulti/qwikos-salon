@@ -8,8 +8,8 @@ import { Star, Scissors, Globe } from "lucide-react";
 interface StylistCardProps {
   id:              string;
   name:            string;
-  avatarUrl?:      string;
-  bio?:            string;
+  avatarUrl?:      string | null;
+  bio?:            string | null;
   specialties:     string[];
   yearsExperience: number;
   rating?:         number;

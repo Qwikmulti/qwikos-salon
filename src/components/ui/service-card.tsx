@@ -40,13 +40,15 @@ interface ServiceCardProps {
   imageUrl?:    string | null;
   onBook?:      (id: string) => void;
   onView?:      (id: string) => void;
+  onSelect?:    (id: string) => void;
+  selected?:    boolean;
   className?:   string;
   variant?:     "default" | "list";
 }
 
 export function ServiceCard({
   id, name, description, category, durationMin, price,
-  imageUrl, onBook, onView, className, variant = "default",
+  imageUrl, onBook, onView, onSelect, selected, className, variant = "default",
 }: ServiceCardProps) {
   const emoji = categoryEmoji[category];
   const label = categoryLabel[category];
@@ -89,11 +91,22 @@ export function ServiceCard({
   }
 
   return (
-    <div className={cn(
-      "bg-graphite border border-white/[0.06] rounded-2xl overflow-hidden",
-      "transition-all duration-300 hover:-translate-y-1 hover:shadow-gold hover:border-gold/20",
-      className
-    )}>
+    <div 
+      onClick={() => onSelect?.(id)}
+      className={cn(
+        "bg-graphite border rounded-2xl overflow-hidden cursor-pointer",
+        "transition-all duration-300",
+        selected 
+          ? "border-gold shadow-[0_0_15px_rgba(201,151,59,0.3)] -translate-y-1 bg-gold/5" 
+          : "border-white/[0.06] hover:-translate-y-1 hover:shadow-gold hover:border-gold/20",
+        className
+      )}
+    >
+      {selected && (
+        <div className="absolute top-3 right-3 z-20 h-6 w-6 rounded-full bg-gold flex items-center justify-center shadow-lg border border-obsidian">
+          <ChevronRight className="h-4 w-4 text-obsidian rotate-90" />
+        </div>
+      )}
       {/* Image or gradient header */}
       <div className="relative h-32 overflow-hidden">
         {imageUrl ? (

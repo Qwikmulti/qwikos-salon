@@ -94,7 +94,7 @@ export function StepStylist({ serviceId, selected, onSelect, onBack }: Props) {
                 specialties={s.specialties}
                 yearsExperience={s.yearsExperience}
                 isActive={s.isActive}
-                avatarUrl={s.profile.avatarUrl}
+                avatarUrl={s.profile.avatarUrl || undefined}
                 onBook={id => onSelect(id, s.profile.fullName)}
               />
             </div>

@@ -29,7 +29,7 @@ const statusColors: Record<PresenceStatus, string> = {
 };
 
 interface AvatarProps {
-  src?:      string;
+  src?:      string | null;
   name?:     string;
   size?:     AvatarSize;
   status?:   PresenceStatus;
@@ -69,7 +69,7 @@ export function Avatar({ src, name, size = "md", status, className }: AvatarProp
 
 // Avatar group — stacked avatars
 interface AvatarGroupProps {
-  users:   Array<{ src?: string; name?: string }>;
+  users:   Array<{ src?: string | null; name?: string }>;
   max?:    number;
   size?:   AvatarSize;
   className?: string;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { prisma } from "@/lib/prisma/client";
 import { BookingCTA } from "@/components/marketing/BookingCTA";
 import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
 import { IMAGES } from "@/lib/utils/images";
@@ -22,12 +23,10 @@ const categories = [
 ] as const;
 
 async function getServices() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/services?active=true`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch services');
-  }
-  const data = await res.json();
-  return data.services;
+  return prisma.service.findMany({
+    where: { isActive: true },
+    orderBy: { category: "asc" },
+  });
 }
 
 export default async function ServicesPage() {
