@@ -29,20 +29,23 @@ export default function LoginPage() {
   });
 
   const onSubmit = async ({ email, password }: FormData) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { toast.error(error.message); return; }
     
-    toast.success("Welcome back!");
+    toast.success("Welcome back! Redirecting...");
     
     if (next) {
-      router.push(next);
+      window.location.href = next;
     } else {
       const { getAuthRedirectAction } = await import("@/lib/actions/auth");
       const redirectPath = await getAuthRedirectAction();
-      router.push(redirectPath);
+      
+      if (redirectPath === "/login") {
+        window.location.href = "/dashboard"; 
+      } else {
+        window.location.href = redirectPath;
+      }
     }
-    
-    router.refresh();
   };
 
   const signInWithGoogle = async () => {
