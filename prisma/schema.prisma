@@ -8,6 +8,211 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Profile {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  fullName  String    @map("full_name")
+  phone     String?
+  avatarUrl String?   @map("avatar_url")
+  role      Role      @default(CUSTOMER)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  bookings  Booking[]
+  stylist   Stylist?
+
+  @@map("profiles")
+}
+
+model Stylist {
+  id                String             @id @default(uuid())
+  profileId         String             @unique @map("profile_id")
+  bio               String?
+  specialties       String[]
+  yearsExperience   Int                @default(0) @map("years_experience")
+  isActive          Boolean            @default(true) @map("is_active")
+  instagramHandle   String?            @map("instagram_handle")
+  heroImageUrl      String?            @map("hero_image_url")
+  portfolioUrls     String[]           @map("portfolio_urls")
+  portfolioImages   Json               @default("[]") @map("portfolio_images")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  availabilitySlots AvailabilitySlot[]
+  blockedTimes      BlockedTime[]
+  bookings          Booking[]
+  recurringHours    RecurringHours[]
+  services          StylistService[]
+  profile           Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("stylists")
+}
+
+model Service {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  category    ServiceCategory
+  durationMin Int              @map("duration_min")
+  price       Decimal          @db.Decimal(10, 2)
+  imageUrl    String?          @map("image_url")
+  imagePath   String?          @map("image_path")
+  isActive    Boolean          @default(true) @map("is_active")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  bookings    Booking[]
+  stylists    StylistService[]
+
+  @@map("services")
+}
+
+model StylistService {
+  id               String   @id @default(uuid())
+  stylistId        String   @map("stylist_id")
+  serviceId        String   @map("service_id")
+  priceOverride    Decimal? @map("price_override") @db.Decimal(10, 2)
+  durationOverride Int?     @map("duration_override")
+  createdAt        DateTime @default(now()) @map("created_at")
+  service          Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  stylist          Stylist  @relation(fields: [stylistId], references: [id], onDelete: Cascade)
+
+  @@unique([stylistId, serviceId], map: "stylist_services_stylistId_serviceId_unique")
+  @@map("stylist_services")
+}
+
+model RecurringHours {
+  id        String    @id @default(uuid())
+  stylistId String    @map("stylist_id")
+  dayOfWeek DayOfWeek @map("day_of_week")
+  startTime String    @map("start_time")
+  endTime   String    @map("end_time")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  stylist   Stylist   @relation(fields: [stylistId], references: [id], onDelete: Cascade)
+
+  @@unique([stylistId, dayOfWeek], map: "recurring_hours_stylistId_dayOfWeek_unique")
+  @@map("recurring_hours")
+}
+
+model AvailabilitySlot {
+  id        String   @id @default(uuid())
+  stylistId String   @map("stylist_id")
+  date      DateTime @map("date") @db.Date
+  startTime String   @map("start_time")
+  endTime   String   @map("end_time")
+  note      String?  @map("note")
+  createdAt DateTime @default(now()) @map("created_at")
+  stylist   Stylist  @relation(fields: [stylistId], references: [id], onDelete: Cascade)
+
+  @@map("availability_slots")
+}
+
+model BlockedTime {
+  id        String   @id @default(uuid())
+  stylistId String   @map("stylist_id")
+  startAt   DateTime @map("start_at")
+  endAt     DateTime @map("end_at")
+  reason    String?  @map("reason")
+  createdAt DateTime @default(now()) @map("created_at")
+  stylist   Stylist  @relation(fields: [stylistId], references: [id], onDelete: Cascade)
+
+  @@map("blocked_times")
+}
+
+model Booking {
+  id           String        @id @default(uuid())
+  customerId   String        @map("customer_id")
+  stylistId    String        @map("stylist_id")
+  serviceId    String        @map("service_id")
+  startAt      DateTime      @map("start_at")
+  endAt        DateTime      @map("end_at")
+  status       BookingStatus @default(PENDING) @map("status")
+  notes        String?       @map("notes")
+  cancelledAt  DateTime?     @map("cancelled_at")
+  cancelReason String?       @map("cancel_reason")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  customer     Profile       @relation(fields: [customerId], references: [id])
+  service      Service       @relation(fields: [serviceId], references: [id])
+  stylist      Stylist       @relation(fields: [stylistId], references: [id])
+  review       Review?
+
+  @@map("bookings")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  bookingId String   @unique @map("booking_id")
+  rating    Int      @map("rating")
+  comment   String?  @map("comment")
+  createdAt DateTime @default(now()) @map("created_at")
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model BlogPost {
+  id             String    @id @default(uuid())
+  title          String
+  slug           String    @unique
+  excerpt        String?
+  content        String
+  coverImageUrl  String?   @map("cover_image_url")
+  coverImagePath String?   @map("cover_image_path")
+  tags           String[]  @map("tags")
+  published      Boolean   @default(false) @map("published")
+  publishedAt    DateTime? @map("published_at")
+  authorId       String    @map("author_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}
+
+model SalonSettings {
+  id              String   @id @default("singleton")
+  salonName       String   @default("SalonOS") @map("salon_name")
+  tagline         String?  @map("tagline")
+  address         String?  @map("address")
+  phone           String?  @map("phone")
+  email           String?  @map("email")
+  logoUrl         String?  @map("logo_url")
+  heroImageUrl    String?  @map("hero_image_url")
+  openingHours    Json?    @map("opening_hours")
+  socialLinks     Json?    @map("social_links")
+  bookingLeadTime Int      @default(60) @map("booking_lead_time")
+  bookingWindow   Int      @default(30) @map("booking_window")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("salon_settings")
+}
+
+model ebooks {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  file_url    String
+  file_name   String
+  uploaded_at DateTime @default(now()) @db.Timestamptz(6)
+  is_active   Boolean  @default(true)
+
+  @@index([is_active], map: "idx_ebooks_is_active")
+  @@index([uploaded_at(sort: Desc)], map: "idx_ebooks_uploaded_at")
+  @@map("ebooks")
+}
+
+model subscribers {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  email         String    @unique
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  email_sent    Boolean   @default(false)
+  email_sent_at DateTime? @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)], map: "idx_subscribers_created_at")
+  @@index([email], map: "idx_subscribers_email")
+  @@index([email_sent], map: "idx_subscribers_email_sent")
+  @@map("subscribers")
+}
+
 enum Role {
   CUSTOMER
   STYLIST
@@ -43,218 +248,4 @@ enum ServiceCategory {
   BEARD
   KIDS
   OTHER
-}
-
-model Profile {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  fullName  String
-  phone     String?
-  avatarUrl String?
-  role      Role     @default(CUSTOMER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  stylist  Stylist?
-  bookings Booking[]
-
-  @@map("profiles")
-}
-
-model Stylist {
-  id              String   @id @default(uuid())
-  profileId       String   @unique
-  bio             String?
-  specialties     String[]
-  yearsExperience Int      @default(0)
-  isActive        Boolean  @default(true)
-  instagramHandle String?
-  heroImageUrl    String?
-  portfolioUrls   String[]
-  portfolioImages Json     @default("[]")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  profile           Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  services          StylistService[]
-  recurringHours    RecurringHours[]
-  availabilitySlots AvailabilitySlot[]
-  blockedTimes      BlockedTime[]
-  bookings          Booking[]
-
-  @@map("stylists")
-}
-
-model Service {
-  id          String          @id @default(uuid())
-  name        String
-  description String?
-  category    ServiceCategory
-  durationMin Int
-  price       Decimal         @db.Decimal(10, 2)
-  imageUrl    String?
-  imagePath   String?
-  isActive    Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-
-  stylists StylistService[]
-  bookings Booking[]
-
-  @@map("services")
-}
-
-model StylistService {
-  id               String   @id @default(uuid())
-  stylistId        String
-  serviceId        String
-  priceOverride    Decimal? @db.Decimal(10, 2)
-  durationOverride Int?
-  createdAt        DateTime @default(now())
-
-  stylist Stylist @relation(fields: [stylistId], references: [id], onDelete: Cascade)
-  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-
-  @@unique([stylistId, serviceId])
-  @@map("stylist_services")
-}
-
-model RecurringHours {
-  id        String    @id @default(uuid())
-  stylistId String
-  dayOfWeek DayOfWeek
-  startTime String
-  endTime   String
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  stylist Stylist @relation(fields: [stylistId], references: [id], onDelete: Cascade)
-
-  @@unique([stylistId, dayOfWeek])
-  @@map("recurring_hours")
-}
-
-model AvailabilitySlot {
-  id        String   @id @default(uuid())
-  stylistId String
-  date      DateTime @db.Date
-  startTime String
-  endTime   String
-  note      String?
-  createdAt DateTime @default(now())
-
-  stylist Stylist @relation(fields: [stylistId], references: [id], onDelete: Cascade)
-
-  @@map("availability_slots")
-}
-
-model BlockedTime {
-  id        String   @id @default(uuid())
-  stylistId String
-  startAt   DateTime
-  endAt     DateTime
-  reason    String?
-  createdAt DateTime @default(now())
-
-  stylist Stylist @relation(fields: [stylistId], references: [id], onDelete: Cascade)
-
-  @@map("blocked_times")
-}
-
-model Booking {
-  id           String        @id @default(uuid())
-  customerId   String
-  stylistId    String
-  serviceId    String
-  startAt      DateTime
-  endAt        DateTime
-  status       BookingStatus @default(PENDING)
-  notes        String?
-  cancelledAt  DateTime?
-  cancelReason String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  customer Profile @relation(fields: [customerId], references: [id])
-  stylist  Stylist @relation(fields: [stylistId], references: [id])
-  service Service @relation(fields: [serviceId], references: [id])
-  review   Review?
-
-  @@map("bookings")
-}
-
-model Review {
-  id        String   @id @default(uuid())
-  bookingId String   @unique
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
-
-  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-
-  @@map("reviews")
-}
-
-model BlogPost {
-  id              String    @id @default(uuid())
-  title           String
-  slug            String    @unique
-  excerpt         String?
-  content         String
-  coverImageUrl   String?
-  coverImagePath  String?
-  tags            String[]
-  published       Boolean   @default(false)
-  publishedAt     DateTime?
-  authorId        String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  @@map("blog_posts")
-}
-
-model SalonSettings {
-  id              String   @id @default("singleton")
-  salonName       String   @default("SalonOS")
-  tagline         String?
-  address         String?
-  phone           String?
-  email           String?
-  logoUrl         String?
-  heroImageUrl    String?
-  openingHours    Json?
-  socialLinks     Json?
-  bookingLeadTime Int      @default(60)
-  bookingWindow   Int      @default(30)
-  updatedAt       DateTime @updatedAt
-
-  @@map("salon_settings")
-}
-
-model ebooks {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title       String
-  file_url    String
-  file_name   String
-  uploaded_at DateTime @default(now()) @db.Timestamptz(6)
-  is_active   Boolean  @default(true)
-
-  @@index([is_active], map: "idx_ebooks_is_active")
-  @@index([uploaded_at(sort: Desc)], map: "idx_ebooks_uploaded_at")
-  @@map("ebooks")
-}
-
-model subscribers {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String
-  email         String    @unique
-  created_at    DateTime  @default(now()) @db.Timestamptz(6)
-  email_sent    Boolean   @default(false)
-  email_sent_at DateTime? @db.Timestamptz(6)
-
-  @@index([created_at(sort: Desc)], map: "idx_subscribers_created_at")
-  @@index([email], map: "idx_subscribers_email")
-  @@index([email_sent], map: "idx_subscribers_email_sent")
-  @@map("subscribers")
 }

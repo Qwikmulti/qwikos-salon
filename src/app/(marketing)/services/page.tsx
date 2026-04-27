@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { prisma } from "@/lib/prisma/client";
 import { BookingCTA } from "@/components/marketing/BookingCTA";
 import { pageMeta, JSON_LD } from "@/lib/seo/metadata";
 import { IMAGES } from "@/lib/utils/images";
@@ -23,10 +22,12 @@ const categories = [
 ] as const;
 
 async function getServices() {
-  return prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/services?active=true`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch services');
+  }
+  const data = await res.json();
+  return data.services;
 }
 
 export default async function ServicesPage() {
@@ -34,7 +35,11 @@ export default async function ServicesPage() {
 
   return (
     <main className="bg-charcoal min-h-screen">
-      <Script strategy="afterInteractive" id="json-ld-local-business" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD.localBusiness) }} />
+      <Script
+        id="json-ld-local-business"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD.localBusiness) }}
+      />
 
       {/* Static Hero Section */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">

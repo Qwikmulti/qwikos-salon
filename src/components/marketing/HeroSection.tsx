@@ -160,7 +160,7 @@ export function HeroSection() {
       </div>
 
       {/* Floating review chip */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: [0, -10, 0] }}
         transition={{
@@ -195,7 +195,7 @@ export function HeroSection() {
           </div>
           <p className="font-body text-xs text-silver">4.9 · 847 reviews</p>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Main content */}
       <motion.div

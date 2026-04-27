@@ -47,7 +47,7 @@ export default function OnboardingPage() {
       });
 
       toast.success("All set!", { description: "Welcome to SalonOS." });
-      router.push(selected === "STYLIST" ? "/stylist/dashboard" : "/dashboard");
+      router.push(selected === "STYLIST" ? "/stylist/dashboard" : "/customer/dashboard");
     } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {

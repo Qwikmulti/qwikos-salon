@@ -52,7 +52,10 @@ export default async function BlogPage() {
 
   return (
     <main className="bg-charcoal min-h-screen">
-      <Script strategy="afterInteractive" id="json-ld" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListJsonLD) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListJsonLD) }}
+      />
 
       <section className="relative py-28 px-6 overflow-hidden">
         <div className="absolute inset-0 noise-overlay opacity-30" />

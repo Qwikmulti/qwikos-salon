@@ -42,9 +42,11 @@ export default function AdminBookingsPage() {
       try {
         const res = await fetch("/api/bookings?limit=100");
         const data = await res.json();
-        if (data.bookings) {
-          setBookings(data.bookings);
-          const uniqueStylists = [...new Set(data.bookings.map((b: BookingData) => b.stylist.profile.fullName))];
+        if (data.bookings && Array.isArray(data.bookings)) {
+          setBookings(data.bookings as BookingData[]);
+          const uniqueStylists = Array.from(new Set(
+            (data.bookings as BookingData[]).map(b => String(b.stylist.profile.fullName))
+          ));
           setStylists(uniqueStylists);
         }
       } catch (e) {

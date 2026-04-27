@@ -120,7 +120,7 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline */}
-      <section className="bg-obsidian py-24">
+      {/* <section className="bg-obsidian py-24">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-14">
             <div className="flex items-center justify-center gap-3 mb-5">
@@ -147,7 +147,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Team photo strip */}
       <section className="bg-charcoal py-16">

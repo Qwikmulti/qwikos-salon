@@ -11,5 +11,12 @@ async function getServices() {
 
 export async function ServicesPreview() {
   const services = await getServices();
-  return <ServicesPreviewClient services={services} />;
+  
+  // Serialize Decimals for Client Components
+  const serializedServices = services.map(service => ({
+    ...service,
+    price: Number(service.price),
+  }));
+
+  return <ServicesPreviewClient services={serializedServices as any} />;
 }

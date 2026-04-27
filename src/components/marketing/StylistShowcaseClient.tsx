@@ -43,54 +43,54 @@ export function StylistShowcaseClient({ stylists }: StylistShowcaseClientProps) 
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
             >
-              <Link
-                href={`/stylists/${stylist.id}`}
-                className="group block bg-graphite border border-ash/30 rounded-2xl overflow-hidden hover:border-gold/30 transition-all"
+              <div
+                className="group relative bg-graphite border border-ash/30 rounded-2xl overflow-hidden hover:border-gold/30 transition-all"
               >
-                <div className="relative h-64">
-                  <Image
-                    src={stylist.heroImageUrl ?? IMAGES.hero.braids}
-                    alt={stylist.profile.fullName}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/50 to-transparent" />
-                  {stylist.instagramHandle && (
-                    <a
-                      href={`https://instagram.com/${stylist.instagramHandle.replace("@", "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute top-4 right-4 p-2 rounded-full bg-obsidian/80 text-silver hover:text-gold transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Globe className="h-4 w-4" />
-                    </a>
-                  )}
-                </div>
-                <div className="p-5">
-                  <p className="font-heading text-lg text-white mb-1 group-hover:text-gold transition-colors">
-                    {stylist.profile.fullName}
-                  </p>
-                  <p className="font-body text-xs text-mist mb-3 line-clamp-2">
-                    {stylist.bio}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-wrap gap-1">
-                      {stylist.specialties.slice(0, 2).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-0.5 rounded-full bg-smoke text-ash font-body text-2xs"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <span className="font-body text-xs text-ash">
-                      {stylist.yearsExperience}y exp
-                    </span>
+                <Link href={`/stylists/${stylist.id}`} className="block">
+                  <div className="relative h-64">
+                    <Image
+                      src={stylist.heroImageUrl ?? IMAGES.hero.braids}
+                      alt={stylist.profile.fullName}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/50 to-transparent" />
                   </div>
-                </div>
-              </Link>
+                  <div className="p-5">
+                    <p className="font-heading text-lg text-white mb-1 group-hover:text-gold transition-colors">
+                      {stylist.profile.fullName}
+                    </p>
+                    <p className="font-body text-xs text-mist mb-3 line-clamp-2">
+                      {stylist.bio}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1">
+                        {stylist.specialties.slice(0, 2).map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 rounded-full bg-smoke text-ash font-body text-2xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <span className="font-body text-xs text-ash">
+                        {stylist.yearsExperience}y exp
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+                {stylist.instagramHandle && (
+                  <a
+                    href={`https://instagram.com/${stylist.instagramHandle.replace("@", "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-4 right-4 p-2 rounded-full bg-obsidian/80 text-silver hover:text-gold transition-colors z-10"
+                  >
+                    <Globe className="h-4 w-4" />
+                  </a>
+                )}
+              </div>
             </motion.div>
           ))}
         </div>

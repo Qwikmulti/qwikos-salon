@@ -29,8 +29,14 @@ export default function LoginPage() {
   const onSubmit = async ({ email, password }: FormData) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { toast.error(error.message); return; }
+    
     toast.success("Welcome back!");
-    router.push("/dashboard");
+    
+    // Get the correct redirect path based on role
+    const { getAuthRedirectAction } = await import("@/lib/actions/auth");
+    const redirectPath = await getAuthRedirectAction();
+    
+    router.push(redirectPath);
     router.refresh();
   };
 

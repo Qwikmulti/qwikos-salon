@@ -8,8 +8,13 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code);
+    
+    if (!error && user) {
+      const { getRoleRedirectPath } = await import("@/lib/supabase/redirects");
+      const redirectPath = await getRoleRedirectPath(user.id);
+      return NextResponse.redirect(`${origin}${redirectPath}`);
+    }
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth`);

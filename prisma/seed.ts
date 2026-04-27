@@ -1,18 +1,52 @@
-import "dotenv/config";
+import { createClient } from "@supabase/supabase-js";
 import { prisma } from "../src/lib/prisma/client";
 
-const ADMIN_ID = "seed-admin-001";
-const STYLIST_1_ID = "seed-stylist-001";
-const STYLIST_2_ID = "seed-stylist-002";
-const STYLIST_3_ID = "seed-stylist-003";
+const ADMIN_ID = "00000000-0000-0000-0000-000000000001";
+const STYLIST_1_ID = "00000000-0000-0000-0000-000000000002";
+const STYLIST_2_ID = "00000000-0000-0000-0000-000000000003";
+const STYLIST_3_ID = "00000000-0000-0000-0000-000000000004";
+const SEED_PASSWORD = "Password123!";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 async function main() {
   console.log("🌱 Seeding database...");
+
+  // Create users in Supabase Auth if they don't exist
+  const authUsers = [
+    { id: ADMIN_ID, email: "admin@salonos.com" },
+    { id: STYLIST_1_ID, email: "fatima@salonos.com" },
+    { id: STYLIST_2_ID, email: "emeka@salonos.com" },
+    { id: STYLIST_3_ID, email: "amara@salonos.com" },
+  ];
+
+  console.log("Creating auth users...");
+  for (const user of authUsers) {
+    const { error } = await supabase.auth.admin.createUser({
+      id: user.id,
+      email: user.email,
+      password: SEED_PASSWORD,
+      email_confirm: true,
+    });
+    
+    if (error) {
+      if (error.message.includes("already exists")) {
+        // Update password if user already exists to ensure login works
+        await supabase.auth.admin.updateUserById(user.id, { password: SEED_PASSWORD });
+      } else {
+        console.warn(`⚠️ Could not create auth user ${user.email}:`, error.message);
+      }
+    }
+  }
 
   // Clean up previous bad seed data where IDs were mismatched
   await prisma.recurringHours.deleteMany();
   await prisma.stylistService.deleteMany();
   await prisma.stylist.deleteMany();
+  await prisma.blogPost.deleteMany();
   await prisma.profile.deleteMany();
 
   await prisma.profile.upsert({
@@ -24,6 +58,37 @@ async function main() {
       fullName: "Salon Admin",
       role: "ADMIN",
       phone: "+44 7700 900000",
+    },
+  });
+
+  // Seed Blog Posts
+  await prisma.blogPost.upsert({
+    where: { slug: "mastering-natural-hair-care" },
+    update: {},
+    create: {
+      title: "Mastering Natural Hair Care: A Guide",
+      slug: "mastering-natural-hair-care",
+      excerpt: "Learn the secrets to maintaining healthy, vibrant natural hair with our expert tips.",
+      content: "Full content about natural hair care goes here...",
+      published: true,
+      publishedAt: new Date(),
+      authorId: ADMIN_ID,
+      tags: ["Natural Hair", "Hair Care"],
+    },
+  });
+
+  await prisma.blogPost.upsert({
+    where: { slug: "summer-braid-trends-2024" },
+    update: {},
+    create: {
+      title: "Summer Braid Trends 2024",
+      slug: "summer-braid-trends-2024",
+      excerpt: "From knotless to boho, discover the hottest braid styles for the summer season.",
+      content: "Full content about summer braid trends...",
+      published: true,
+      publishedAt: new Date(),
+      authorId: ADMIN_ID,
+      tags: ["Braiding", "Trends"],
     },
   });
 
