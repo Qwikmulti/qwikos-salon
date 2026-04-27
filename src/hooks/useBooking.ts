@@ -22,7 +22,10 @@ export function useBooking(): UseBookingResult {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.message ?? "Booking failed");
+        const msg = typeof err.error === 'string' ? err.error : 
+                    typeof err.message === 'string' ? err.message : 
+                    "Booking failed";
+        throw new Error(msg);
       }
       toast.success("Booking confirmed!", {
         description: "Check your email for confirmation details.",

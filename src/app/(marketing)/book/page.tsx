@@ -1,12 +1,26 @@
 import type { Metadata } from "next";
 import { BookingWizard } from "@/components/booking/BookingWizard";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = { title: "Book Appointment" };
 
 interface Props { searchParams: Promise<{ service?: string; stylist?: string }> }
 
 export default async function BookPage({ searchParams }: Props) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
   const { service, stylist } = await searchParams;
+
+  if (!user) {
+    const params = new URLSearchParams();
+    if (service) params.set("service", service);
+    if (stylist) params.set("stylist", stylist);
+    const qs = params.toString();
+    const returnPath = `/book${qs ? `?${qs}` : ''}`;
+    redirect(`/login?next=${encodeURIComponent(returnPath)}`);
+  }
   return (
     <section className="min-h-screen bg-charcoal py-8">
       {/* Header banner */}

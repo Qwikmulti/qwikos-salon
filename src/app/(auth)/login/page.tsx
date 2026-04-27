@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,6 +19,8 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const router   = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
   const supabase = createClient();
   const [showPw, setShowPw] = useState(false);
 
@@ -32,18 +34,21 @@ export default function LoginPage() {
     
     toast.success("Welcome back!");
     
-    // Get the correct redirect path based on role
-    const { getAuthRedirectAction } = await import("@/lib/actions/auth");
-    const redirectPath = await getAuthRedirectAction();
+    if (next) {
+      router.push(next);
+    } else {
+      const { getAuthRedirectAction } = await import("@/lib/actions/auth");
+      const redirectPath = await getAuthRedirectAction();
+      router.push(redirectPath);
+    }
     
-    router.push(redirectPath);
     router.refresh();
   };
 
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options:  { redirectTo: `${window.location.origin}/api/auth/callback` },
+      options:  { redirectTo: `${window.location.origin}/api/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}` },
     });
   };
 
@@ -54,7 +59,7 @@ export default function LoginPage() {
         <h1 className="font-display text-4xl font-light text-white mb-2">Welcome back</h1>
         <p className="font-body text-sm text-mist">
           Don't have an account?{" "}
-          <Link href="/register" className="text-gold hover:text-gold-light transition-colors font-medium">
+          <Link href={`/register${next ? `?next=${encodeURIComponent(next)}` : ''}`} className="text-gold hover:text-gold-light transition-colors font-medium">
             Create one free
           </Link>
         </p>

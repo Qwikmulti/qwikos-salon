@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,6 +32,8 @@ const passwordRules = [
 
 export default function RegisterPage() {
   const router   = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
   const supabase = createClient();
   const [showPw, setShowPw] = useState(false);
 
@@ -48,13 +50,17 @@ export default function RegisterPage() {
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Account created!", { description: "Check your email to confirm your account." });
-    router.push("/onboarding");
+    if (next) {
+      router.push(next);
+    } else {
+      router.push("/onboarding");
+    }
   };
 
   const signUpWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options:  { redirectTo: `${window.location.origin}/api/auth/callback?next=/onboarding` },
+      options:  { redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next || '/onboarding')}` },
     });
   };
 
@@ -64,7 +70,7 @@ export default function RegisterPage() {
         <h1 className="font-display text-4xl font-light text-white mb-2">Create account</h1>
         <p className="font-body text-sm text-mist">
           Already have one?{" "}
-          <Link href="/login" className="text-gold hover:text-gold-light transition-colors font-medium">Sign in</Link>
+          <Link href={`/login${next ? `?next=${encodeURIComponent(next)}` : ''}`} className="text-gold hover:text-gold-light transition-colors font-medium">Sign in</Link>
         </p>
       </div>
 

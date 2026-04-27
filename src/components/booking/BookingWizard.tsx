@@ -70,7 +70,7 @@ export function BookingWizard({ initialServiceId, initialStylistId }: { initialS
       notes:     state.notes || undefined,
     });
 
-    if (ok) router.push("/bookings?booked=1");
+    if (ok) router.push("/customer/bookings?booked=1");
   };
 
   return (
