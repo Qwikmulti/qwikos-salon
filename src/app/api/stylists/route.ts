@@ -22,12 +22,37 @@ const updateSchema = z.object({
   })).optional(),
 });
 
-/** GET /api/stylists — list all active stylists (public) */
+/** GET /api/stylists — list all active stylists (public) or fetch own profile */
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const serviceId = searchParams.get("serviceId");
   const all = searchParams.get("all");
+  const me = searchParams.get("me");
 
+  // If me=true, return current stylist's profile
+  if (me === "true") {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const stylist = await prisma.stylist.findUnique({
+      where: { profileId: user.id },
+      include: { 
+        profile: { select: { fullName: true, email: true, avatarUrl: true, phone: true } },
+      },
+    });
+
+    if (!stylist) {
+      return NextResponse.json({ error: "Stylist not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ stylist, profile: stylist.profile });
+  }
+
+  // Otherwise, return list of stylists (public)
   const stylists = await prisma.stylist.findMany({
     where: {
       ...(all !== "true" ? { isActive: true, status: "APPROVED" } : {}),

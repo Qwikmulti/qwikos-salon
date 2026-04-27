@@ -57,6 +57,7 @@ model Service {
   imageUrl    String?          @map("image_url")
   imagePath   String?          @map("image_path")
   isActive    Boolean          @default(true) @map("is_active")
+  isCustom    Boolean          @default(false) @map("is_custom")
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
   bookings    Booking[]
