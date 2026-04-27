@@ -36,7 +36,7 @@ export default async function StylistDashboardPage() {
     include: { stylist: true },
   });
 
-  if (!profile?.stylist) redirect("/onboarding");
+  if (!profile?.stylist) redirect("/");
 
   const stylistId = profile.stylist.id;
 

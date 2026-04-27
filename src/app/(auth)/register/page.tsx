@@ -50,17 +50,20 @@ export default function RegisterPage() {
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Account created!", { description: "Check your email to confirm your account." });
+    
     if (next) {
       router.push(next);
     } else {
-      router.push("/onboarding");
+      const { getAuthRedirectAction } = await import("@/lib/actions/auth");
+      const path = await getAuthRedirectAction();
+      router.push(path);
     }
   };
 
   const signUpWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options:  { redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next || '/onboarding')}` },
+      options:  { redirectTo: `${window.location.origin}/api/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}` },
     });
   };
 

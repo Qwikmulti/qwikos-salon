@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma/client";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Determines the correct redirect path for a user based on their role
@@ -12,7 +13,21 @@ export async function getRoleRedirectPath(userId: string): Promise<string> {
   });
 
   if (!profile) {
-    return "/onboarding";
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      await prisma.profile.create({
+        data: {
+          id: userId,
+          email: user.email!,
+          fullName: user.user_metadata?.full_name ?? "Customer",
+          role: "CUSTOMER",
+        },
+      });
+      return "/customer/dashboard";
+    }
+    return "/login";
   }
 
   switch (profile.role) {
@@ -23,6 +38,6 @@ export async function getRoleRedirectPath(userId: string): Promise<string> {
     case "CUSTOMER":
       return "/customer/dashboard";
     default:
-      return "/onboarding";
+      return "/customer/dashboard";
   }
 }

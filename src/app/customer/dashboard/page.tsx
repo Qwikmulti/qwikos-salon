@@ -22,7 +22,7 @@ export default async function CustomerDashboardPage() {
   if (!user) redirect("/login");
 
   const profile = await prisma.profile.findUnique({ where: { id: user.id } });
-  if (!profile) redirect("/onboarding");
+  if (!profile) redirect("/login");
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);

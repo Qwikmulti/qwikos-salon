@@ -43,6 +43,17 @@ export default function AdminStylistsPage() {
   const [stylists, setStylists] = useState<StylistRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    specialties: "",
+    bio: "",
+    instagramHandle: "",
+    yearsExperience: "0"
+  });
 
   const fetchStylists = async () => {
     try {
@@ -77,6 +88,38 @@ export default function AdminStylistsPage() {
   useEffect(() => {
     fetchStylists();
   }, []);
+
+  const handleAddStylist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/stylists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          specialties: formData.specialties.split(",").map(s => s.trim()).filter(Boolean),
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Stylist created successfully");
+        setShowAdd(false);
+        setFormData({
+          fullName: "", email: "", password: "",
+          specialties: "", bio: "", instagramHandle: "", yearsExperience: "0"
+        });
+        fetchStylists();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || "Failed to create stylist");
+      }
+    } catch (err) {
+      toast.error("An error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
@@ -125,6 +168,12 @@ export default function AdminStylistsPage() {
         eyebrow="Management"
         title="Stylists"
         description={`${stylists.length} registered stylists`}
+        actions={
+          <Button onClick={() => setShowAdd(true)}>
+            <Plus className="h-4 w-4" />
+            Add Stylist
+          </Button>
+        }
       />
 
       <Input placeholder="Search stylists…" icon={<Search className="h-4 w-4" />} value={query} onChange={e => setQuery(e.target.value)} />
@@ -168,6 +217,74 @@ export default function AdminStylistsPage() {
           )}
         </div>
       </Card>
+
+      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+        <DialogContent size="lg">
+          <DialogHeader>
+            <DialogTitle>Add New Stylist</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddStylist}>
+            <DialogBody className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Full Name"
+                  required
+                  value={formData.fullName}
+                  onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                />
+                <Input
+                  label="Email Address"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Temporary Password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                />
+                <Input
+                  label="Years of Experience"
+                  type="number"
+                  value={formData.yearsExperience}
+                  onChange={e => setFormData({ ...formData, yearsExperience: e.target.value })}
+                />
+              </div>
+              <Input
+                label="Specialties (comma separated)"
+                placeholder="Braids, Natural Hair, Silk Press..."
+                value={formData.specialties}
+                onChange={e => setFormData({ ...formData, specialties: e.target.value })}
+              />
+              <Input
+                label="Instagram Handle (optional)"
+                placeholder="@stylist_name"
+                value={formData.instagramHandle}
+                onChange={e => setFormData({ ...formData, instagramHandle: e.target.value })}
+              />
+              <Textarea
+                label="Professional Bio"
+                rows={4}
+                value={formData.bio}
+                onChange={e => setFormData({ ...formData, bio: e.target.value })}
+              />
+            </DialogBody>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setShowAdd(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={isSubmitting}>
+                Create Stylist Account
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

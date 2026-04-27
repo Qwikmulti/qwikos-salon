@@ -13,7 +13,7 @@ export default async function StylistLayout({ children }: { children: React.Reac
     include: { stylist: true },
   });
 
-  if (!profile?.stylist) redirect("/onboarding");
+  if (!profile?.stylist) redirect("/");
 
   return (
     <DashboardShell 
